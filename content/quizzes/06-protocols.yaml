@@ -1,0 +1,542 @@
+part: protocols
+questions:
+  - id: q-protocol-layers-1
+    chapter: protocol-layers
+    type: single
+    question: 协议在芯片里落地的「三件套」是？
+    options:
+      - 光罩、探针卡、吸塑盘
+      - 软件驱动、数字 Controller、PHY
+      - 仅有规范 PDF 即可流片
+      - LUT、BRAM、DSP
+    answer: 1
+    explanation: 软件说话，控制器守规矩，PHY 把比特变成波形；字段细节留给规范，芯片课先认这三段。
+    difficulty: easy
+
+  - id: q-protocol-layers-2
+    chapter: protocol-layers
+    type: judge
+    question: 应用/事务/链路/物理分层，意味着必须流片成四颗独立芯片。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 分层是分工，不是四块必须分开的硅；一颗 SoC 里可以叠多层，也可以把低速 PHY 简化成管脚驱动。
+    difficulty: easy
+
+  - id: q-protocol-layers-3
+    chapter: protocol-layers
+    type: single
+    question: 改协议「行为」（重试、寄存器语义）与改「速率/眼图」，通常分别动哪里？
+    options:
+      - 行为多半动 Controller 与驱动，速率与信号完整性多半动 PHY 与封装/板级
+      - 两者都只改丝印
+      - 行为只改光刻胶，速率只改 App 图标
+      - 全部只改 CPU 主频广告
+    answer: 0
+    explanation: 这是分层落地的实用判据，避免所有问题都去调模拟或都去改软件。
+    difficulty: easy
+
+  - id: q-protocol-layers-4
+    chapter: protocol-layers
+    type: scenario
+    question: MCU 经 UART 打印字符。用落地语言描述数据路径，哪句最准确？
+    options:
+      - 规范文档直接驱动管脚，不需要电路
+      - CPU 上的驱动写发送寄存器 → UART 控制器组帧推比特 → 管脚驱动（简易 PHY）出波形
+      - 只有 PHY 在跑，CPU 不参与
+      - 必须经过 PCIe 交换机
+    answer: 1
+    explanation: 低速例子把三件套缩到最小；高速接口只是把中间两段加厚，分层不换。
+    difficulty: medium
+
+  - id: q-onchip-bus-1
+    chapter: onchip-bus
+    type: single
+    question: 在 AMBA 家族直觉里，AXI、AHB、APB 更常分别用于？
+    options:
+      - AXI 配低速传感器，APB 扛 CPU 缓存一致性带宽
+      - AXI 高性能突发，AHB 中速系统总线，APB 低速外设寄存器
+      - 三者电气上完全相同，只是改名
+      - 全部只能连接模拟运放
+    answer: 1
+    explanation: 选型看带宽与复杂度：CPU/DMA/内存走高性能，配置寄存器走 APB 更经济。
+    difficulty: easy
+
+  - id: q-onchip-bus-2
+    chapter: onchip-bus
+    type: judge
+    question: 片上总线要回答的是「谁连谁、怎么译码地址、如何突发与握手」，而不是差分眼图。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 片上互连是数字事务层；物理波形属于片外/PHY。入门不要把 AXI 和 PCIe PHY 混成一件事。
+    difficulty: easy
+
+  - id: q-onchip-bus-3
+    chapter: onchip-bus
+    type: single
+    question: 地址译码的基本直觉是？
+    options:
+      - 所有从设备同时占用同一地址，靠运气响应
+      - 按 memory map 把地址区间映射到唯一从设备片选
+      - 译码只在封装厂完成
+      - 地址总线只用于复位
+    answer: 1
+    explanation: 译码错误是 SoC 集成第一常见缺陷；总线协议再正确，选错从设备也是系统错误。
+    difficulty: easy
+
+  - id: q-onchip-bus-4
+    chapter: onchip-bus
+    type: scenario
+    question: DMA 要搬大量数据，配置寄存器却也挂在同一条低性能 APB 上与 DMA 抢带宽。更好的架构是？
+    options:
+      - 继续抢，靠提高 APB 频率到 GHz
+      - 数据通路走 AXI（或等价高性能互连），寄存器配置走 APB 桥
+      - 取消 DMA，让 CPU 逐字节写
+      - 把 APB 换成无线
+    answer: 1
+    explanation: 片上选型：大块搬移与寄存器访问应分层，而不是一条总线通吃。
+    difficulty: medium
+
+  - id: q-coherency-noc-1
+    chapter: coherency-noc
+    type: single
+    question: 缓存一致性总线（如 ACE/CHI 一类）要解决的问题是？
+    options:
+      - 让多个带缓存的主设备看到同一内存位置的一致值
+      - 替代所有板级 UART
+      - 自动生成模拟版图匹配
+      - 只用于单主设备 APB
+    answer: 0
+    explanation: 多核/加速器共享内存时，一致性协议保证「谁持有最新副本」；单核无缓存系统通常不需要。
+    difficulty: easy
+
+  - id: q-coherency-noc-2
+    chapter: coherency-noc
+    type: judge
+    question: NoC（片上网络）用路由数据包代替巨型共享总线，更适合很多主从、高带宽的互连。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 总线会在主设备变多时成为瓶颈；NoC 用拓扑换可扩展性，但延迟和验证更复杂。
+    difficulty: easy
+
+  - id: q-coherency-noc-3
+    chapter: coherency-noc
+    type: single
+    question: 什么时候「普通 AXI 就够」，不必上一致性互连？
+    options:
+      - 多个 CPU 核要共享可缓存内存且各自有 cache
+      - 单核或外设 DMA 经非缓存路径访问，软件用显式维护
+      - 永远必须上 CHI，否则无法复位
+      - GPIO 翻转必须走 ACE
+    answer: 1
+    explanation: 一致性有面积和验证成本；用不上缓存共享就不要为名词而上总线。
+    difficulty: easy
+
+  - id: q-coherency-noc-4
+    chapter: coherency-noc
+    type: scenario
+    question: 双核各改同一变量，软件没加锁、硬件也无一致性。最可能的系统现象是？
+    options:
+      - 两者 cache 各持旧/新副本，结果不可复现
+      - 晶圆厂会自动插入侦听
+      - APB 会纠正缓存
+      - 现象只出现在模拟运放
+    answer: 0
+    explanation: 一致性要么硬件保证，要么软件显式冲洗；两者都不做就会出现「有时对有时错」。
+    difficulty: medium
+
+  - id: q-memory-interfaces-1
+    chapter: memory-interfaces
+    type: single
+    question: DDR/LPDDR 在芯片里的落地结构，更接近哪一句？
+    options:
+      - 只有软件驱动，没有控制器
+      - 存储控制器管调度与协议状态，PHY 管高速 DQ/DQS 训练与波形
+      - 只有 PHY，CPU 直接拨动差分对
+      - 等价于片上 SRAM 编译器
+    answer: 1
+    explanation: 存储接口是 Controller+PHY 的典型厚实现，还叠加封装和 PCB 约束。
+    difficulty: easy
+
+  - id: q-memory-interfaces-2
+    chapter: memory-interfaces
+    type: judge
+    question: HBM 相对传统 DDR 封装，更强调近芯片的高带宽堆叠，常用于带宽饥渴的加速器，而不是最低成本的消费 MCU。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 选型看带宽与封装成本；HBM 不是「更快的 UART」。
+    difficulty: easy
+
+  - id: q-memory-interfaces-3
+    chapter: memory-interfaces
+    type: single
+    question: Flash 与 DRAM 在系统角色上的关键差别是？
+    options:
+      - 两者都掉电丢失
+      - DRAM 作工作内存（易失、快），Flash 作非易失存储（保留固件/文件系统）
+      - Flash 比 DRAM 更适合当 CPU 缓存
+      - DRAM 不需要控制器
+    answer: 1
+    explanation: 存储家族先分易失/非易失和延迟带宽，再谈具体协议代际。
+    difficulty: easy
+
+  - id: q-memory-interfaces-4
+    chapter: memory-interfaces
+    type: scenario
+    question: 可穿戴 SoC 要省电、容量中等，主存更可能选？
+    options:
+      - 服务器向的高功耗多通道 DDR，并外挂 HBM
+      - LPDDR 一类移动低功耗 DRAM，代码与参数放 Flash
+      - 只用寄存器堆当主存跑操作系统
+      - 用 CAN 总线当内存
+    answer: 1
+    explanation: 存储选型绑定功耗与形态：移动看 LPDDR，桌面/服务器看 DDR 通道，AI 看 HBM。
+    difficulty: medium
+
+  - id: q-highspeed-io-1
+    chapter: highspeed-io
+    type: single
+    question: PCIe、USB、Ethernet 在硅上的共同结构直觉是？
+    options:
+      - 都是纯 GPIO 位翻转，没有 PHY
+      - 数字 MAC/控制器 + 高速串行 PHY（SerDes），再加主机或固件中的驱动
+      - 都只能片上走 APB
+      - 都不需要时钟恢复
+    answer: 1
+    explanation: 高速互连把链路/物理做厚：编码、均衡、时钟恢复都在 PHY 侧。
+    difficulty: easy
+
+  - id: q-highspeed-io-2
+    chapter: highspeed-io
+    type: judge
+    question: 把 PCIe 控制器挂到 AXI 后，不集成或未对准 PHY，芯片仍能在板级链路上达到规格速率。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 控制器没有 PHY 就出不了符合规范的波形；两者之间还有 PIPE 一类专用接口要对齐。
+    difficulty: easy
+
+  - id: q-highspeed-io-3
+    chapter: highspeed-io
+    type: single
+    question: 三者的「系统位置」哪句更准确？
+    options:
+      - PCIe 偏扩展外设/加速器，USB 偏通用外设连接，Ethernet 偏网络交换
+      - USB 只能连内存颗粒，Ethernet 只能点灯
+      - PCIe 是板级 I2C 的别名
+      - 三者都是无线基带
+    answer: 0
+    explanation: 选型先认场景：插槽扩展、消费互联、还是组网，再谈代际速率。
+    difficulty: easy
+
+  - id: q-highspeed-io-4
+    chapter: highspeed-io
+    type: scenario
+    question: 工业相机要把图像送到 PC，团队纠结 USB 与 GigE。按落地而不是名词，应先比什么？
+    options:
+      - 只比哪个缩写更新
+      - 带宽、线缆距离、主机生态、SoC 上是否已有对应 Controller+PHY 与驱动
+      - 只比晶圆厂名称
+      - 必须同时上 PCIe 插槽到相机镜头
+    answer: 1
+    explanation: 高速接口选型是系统题：距离和生态往往压过「理论峰值」。
+    difficulty: medium
+
+  - id: q-multimedia-io-1
+    chapter: multimedia-io
+    type: single
+    question: MIPI CSI/DSI 在手机 SoC 里通常连接什么？
+    options:
+      - 只连接以太网交换机
+      - 摄像头传感器与显示屏，经专用控制器和 PHY
+      - 只连接 JTAG
+      - 只连接功率 MOS
+    answer: 1
+    explanation: 多媒体接口是影像/显示的专用高速族，落地仍是控制器+PHY+驱动/ISP。
+    difficulty: easy
+
+  - id: q-multimedia-io-2
+    chapter: multimedia-io
+    type: judge
+    question: HDMI/DisplayPort 与 MIPI 都叫「视频口」，因此电气、线缆和版权/认证约束完全可互换。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 都服务视频，但生态不同：移动屏内常用 MIPI，消费线缆常用 HDMI/DP，不能只看「都能出画面」。
+    difficulty: easy
+
+  - id: q-multimedia-io-3
+    chapter: multimedia-io
+    type: single
+    question: 为什么多媒体接口常与 ISP/显示处理器一起规划，而不是只挂一个 GPIO？
+    options:
+      - 像素带宽和时序必须由专用数据通路消化，GPIO 翻转不够也不经济
+      - GPIO 电压更高所以更适合 4K
+      - 规范禁止使用控制器
+      - 视频口不需要时钟
+    answer: 0
+    explanation: 带宽决定架构：高像素必须走专用通路和 PHY，而不是通用低速口。
+    difficulty: easy
+
+  - id: q-multimedia-io-4
+    chapter: multimedia-io
+    type: scenario
+    question: 平板要驱一块 MIPI 屏，却只买了 HDMI 发射 PHY IP。后果是？
+    options:
+      - PHY 会自动翻译所有视频协议
+      - 控制器与 PHY 家族不匹配，无法按屏厂时序出图，需要对应 DSI 方案或桥接芯片
+      - 只要分辨率数字相同就一定兼容
+      - 可以改用 I2C 传 4K 视频
+    answer: 1
+    explanation: 协议落地强调「成套 IP」：控制器、PHY、驱动和认证必须是同一家族。
+    difficulty: medium
+
+  - id: q-board-lowspeed-1
+    chapter: board-lowspeed
+    type: single
+    question: I2C、SPI、UART 的板级直觉分别是？
+    options:
+      - I2C 两线多从、SPI 时钟同步高速些、UART 异步点对点
+      - UART 必须四根时钟线，I2C 最快
+      - SPI 不能接传感器
+      - 三者都是 SerDes 眼图协议
+    answer: 0
+    explanation: 低速口是传感器和配置的日常语言，先记拓扑和时钟模型，再记速率上限。
+    difficulty: easy
+
+  - id: q-board-lowspeed-2
+    chapter: board-lowspeed
+    type: judge
+    question: 低速接口往往没有独立高速 PHY，管脚驱动加少量保护电路就是物理层，但仍然有数字控制器和驱动。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 分层仍在，只是 PHY 变薄；不能因为简单就跳过控制器寄存器模型。
+    difficulty: easy
+
+  - id: q-board-lowspeed-3
+    chapter: board-lowspeed
+    type: single
+    question: I2S 与 CAN 更常出现在哪类场景？
+    options:
+      - I2S 音频编解码，CAN 车辆/工业现场总线
+      - I2S 缓存一致性，CAN 显示器 4K
+      - 两者都用于 HBM 堆叠
+      - 两者都替代 PCIe
+    answer: 0
+    explanation: 板级口要按领域记：音频、汽车、通用 GPIO，避免所有外设都塞进一种总线。
+    difficulty: easy
+
+  - id: q-board-lowspeed-4
+    chapter: board-lowspeed
+    type: scenario
+    question: 一块板上有 8 颗传感器，希望少占管脚且速率不高。优先试哪种？
+    options:
+      - 每颗传感器独占一组并行 DDR
+      - I2C 总线多从地址，注意上拉与地址冲突
+      - 每颗都上 PCIe x16
+      - 用 HBM 堆叠传感器
+    answer: 1
+    explanation: 管脚和拓扑是低速选型的第一刀；I2C 适合多从慢设备，SPI 适合更快的点对点或少从。
+    difficulty: medium
+
+  - id: q-debug-jtag-1
+    chapter: debug-jtag
+    type: single
+    question: JTAG 在芯片里同时服务哪两类事情？
+    options:
+      - 只服务无线基带编码
+      - 调试访问（停核、读写寄存器/内存）以及测试（边界扫描等，与 DFT 衔接）
+      - 只服务 HDMI 版权认证
+      - 替代所有功能验证
+    answer: 1
+    explanation: 调试口是硅与外界的「检修门」：开发用它看核，量产用它或相关测试访问。
+    difficulty: easy
+
+  - id: q-debug-jtag-2
+    chapter: debug-jtag
+    type: judge
+    question: SWD 可以看作在资源受限 MCU 上用更少管脚完成类似调试访问的一种实现，并不否定「需要调试通路」这件事。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 管脚少时用 SWD，但落地仍是调试控制器 + 管脚 + 软件工具链。
+    difficulty: easy
+
+  - id: q-debug-jtag-3
+    chapter: debug-jtag
+    type: single
+    question: 为什么量产芯片有时会关掉或保护调试口？
+    options:
+      - 调试口与安全、攻击面相关，量产要权衡可维护性与不可随意读密钥
+      - 关掉调试口能提高主频一倍
+      - JTAG 会干扰光刻
+      - 规范禁止量产存在任何测试
+    answer: 0
+    explanation: 调试与安全、DFT 是三角：完全敞开有风险，完全焊死则售后与失败分析变难。
+    difficulty: easy
+
+  - id: q-debug-jtag-4
+    chapter: debug-jtag
+    type: scenario
+    question: 带回片无法点亮，又没有预留调试口。你失去的是什么能力？
+    options:
+      - 仍然可以轻松观察 PC 和寄存器
+      - 难以停核、读内存和做边界扫描，失败分析成本急剧上升
+      - 晶圆厂能从 GDS 反推出运行时 PC
+      - UART 会自动变成 JTAG
+    answer: 1
+    explanation: 调试接口必须在规格阶段留下；它不是装饰管脚。
+    difficulty: medium
+
+  - id: q-wireless-in-soc-1
+    chapter: wireless-in-soc
+    type: single
+    question: 无线进入 SoC，仍然最像哪套落地结构？
+    options:
+      - 只有天线，没有数字协议栈
+      - 协议栈/驱动 + 数字基带或 MAC 控制器 + 射频 PHY/前端
+      - 只把 UART 改名为 Wi-Fi
+      - 无线不需要时钟和电源域
+    answer: 1
+    explanation: 无线不是第四种物理学，而是 Contoller/基带 + 射频 PHY + 软件栈，再加认证与天线。
+    difficulty: easy
+
+  - id: q-wireless-in-soc-2
+    chapter: wireless-in-soc
+    type: judge
+    question: 把 Wi-Fi/蓝牙/蜂窝 IP 集成进 SoC 时，数字后端可以忽略射频隔离、晶振和共存，因为它们「也是协议」。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 射频对噪声、电源和天线极度敏感；无线集成是混合信号+系统问题，不是只挂一条 AXI。
+    difficulty: easy
+
+  - id: q-wireless-in-soc-3
+    chapter: wireless-in-soc
+    type: single
+    question: 蜂窝基带相对蓝牙，通常多出的系统负担是？
+    options:
+      - 更简单的单层 GPIO
+      - 更重的协议栈、认证、天线前端和功耗管理，常独立成芯片或大子系统
+      - 不需要任何 PHY
+      - 只能用 APB 传射频波形
+    answer: 1
+    explanation: 选型要认复杂度量级：蓝牙/Wi-Fi 常进消费 SoC，蜂窝更常是独立 modem 或大 IP。
+    difficulty: easy
+
+  - id: q-wireless-in-soc-4
+    chapter: wireless-in-soc
+    type: scenario
+    question: 可穿戴要做蓝牙连接，团队准备自研全部射频与协议栈。更稳妥的入门策略是？
+    options:
+      - 立刻自研蜂窝以「一步到位」
+      - 外购认证过的蓝牙 Controller+射频 IP 或模组，把精力放在应用与低功耗集成
+      - 用 I2C 模拟无线信道
+      - 不需要天线
+    answer: 1
+    explanation: 无线的坑在认证与射频；入门应复用成熟 IP/模组，而不是从麦克斯韦方程重写协议。
+    difficulty: medium
+
+  - id: q-protocol-selection-1
+    chapter: protocol-selection
+    type: single
+    question: 协议选型地图的第一批尺子应包括？
+    options:
+      - 缩写是否时髦
+      - 带宽、距离、功耗、管脚数、延迟和软件/IP 生态
+      - 仅有纳米节点
+      - 仅有封装颜色
+    answer: 1
+    explanation: 选型是多约束权衡，不是背名词表。
+    difficulty: easy
+
+  - id: q-protocol-selection-2
+    chapter: protocol-selection
+    type: judge
+    question: 片上用 AXI、板级用 I2C、出盒用 USB，可以同时存在于同一产品，因为它们处在不同层次与距离。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 选型地图按「在哪一段路」选协议，而不是全世界只用一种总线。
+    difficulty: easy
+
+  - id: q-protocol-selection-3
+    chapter: protocol-selection
+    type: single
+    question: 「带宽不够」时，正确的升级方向取决于卡在哪一层。下列哪组匹配更合理？
+    options:
+      - 片上拥塞 → 加 UART；板级传感器 → 上 HBM
+      - 片上搬移 → 提升互连/NoC；片外主存 → 升级存储接口；出盒 → 升级高速 IO
+      - 任何不够都改成 GPIO
+      - 任何不够都上一致性总线
+    answer: 1
+    explanation: 分层选型：每一层有自己的升级阶梯，跨层乱升级是常见浪费。
+    difficulty: easy
+
+  - id: q-protocol-selection-4
+    chapter: protocol-selection
+    type: scenario
+    question: 工控 MCU：要配传感器、要连现场总线、要偶尔升级固件，不要高清视频。一套更合理的组合是？
+    options:
+      - HBM + HDMI + PCIe x16 + 蜂窝基带全家桶
+      - 片上 AHB/APB + I2C/SPI/UART + CAN，调试留 SWD/JTAG，升级走 UART/USB
+      - 只保留 AXI ACE 一致性，去掉所有外设
+      - 只用模拟运放实现全部协议
+    answer: 1
+    explanation: 选型综合题：按场景裁剪，而不是按手册目录全选。
+    difficulty: medium
+
+  - id: q-protocols-exam-1
+    chapter: protocols-exam
+    type: scenario
+    question: 用「分层 + 位置」一句话描述手机 SoC 的协议骨架，哪句最完整？
+    options:
+      - 只有 I2C，没有存储和无线
+      - 片上 AXI/NoC，主存 LPDDR Controller+PHY，影像 MIPI，出盒 USB/PCIe，低速传感器 I2C/SPI，调试 JTAG，无线是基带+射频
+      - 全部协议都在应用层软件里用循环实现，没有 PHY
+      - 只有功率器件接口
+    answer: 1
+    explanation: 篇末综合：分层落地 + 片上/存储/高速/板级/调试/无线同时出现。
+    difficulty: medium
+
+  - id: q-protocols-exam-2
+    chapter: protocols-exam
+    type: single
+    question: 为什么本手册反复强调 Controller+PHY+驱动，而不是协议字段表？
+    options:
+      - 字段不重要
+      - 芯片工作按这三段分工与交接，字段是规范细节，不先认结构就会把所有问题堆到同一岗
+      - PHY 可以完全用 Python 替代
+      - 驱动可以替代签核
+    answer: 1
+    explanation: 协议篇的教学法：结构先于字段，位置先于缩写。
+    difficulty: easy
+
+  - id: q-protocols-exam-3
+    chapter: protocols-exam
+    type: judge
+    question: 规格阶段选定协议家族，等于同时选定了 IP、管脚、时钟、电源域和部分软件栈。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 这是协议与全流程的接口：协议不是某一岗的专属名词，而是架构约束。
+    difficulty: easy
+
+  - id: q-protocols-exam-4
+    chapter: protocols-exam
+    type: single
+    question: 下列哪对「问题 → 优先查看层」匹配正确？
+    options:
+      - 眼图差 → 先改应用层业务逻辑；地址译码错 → 先改射频天线
+      - 眼图/误码 → PHY 与板级；寄存器行为/重试 → Controller 与驱动；选错从设备 → 片上译码
+      - 所有问题 → 先换更小纳米
+      - 所有问题 → 先加状态机深度
+    answer: 1
+    explanation: 分层的检验：会把现象分到正确的一段，而不是全局乱改。
+    difficulty: easy
+
+  - id: q-protocols-exam-5
+    chapter: protocols-exam
+    type: scenario
+    question: 新产品要「片上多核共享内存 + 板级很多传感器 + 出盒高速传图」。协议组合与风险，哪项判断更成熟？
+    options:
+      - 传感器用 HBM，多核只用 APB，出盒用 I2C 传图
+      - 多核考虑一致性或软件维护缓存，传感器用 I2C/SPI，传图用 CSI/USB/PCIe/Ethernet 按距离选型，并分别规划 PHY 与时钟域
+      - 一种 AXI 贯穿天线到镜头
+      - 取消调试口以节省设计
+    answer: 1
+    explanation: 终考：按层次选型，并为 CDC、PHY 和调试留预算，而不是单总线幻想。
+    difficulty: medium

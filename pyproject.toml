@@ -1,0 +1,24 @@
+[project]
+name = "chipdesignagent"
+version = "0.1.0"
+description = "芯片设计入门手册：知识库、进度跟踪与导学智能体"
+requires-python = ">=3.12"
+dependencies = [
+    "fastapi>=0.115.0",
+    "uvicorn[standard]>=0.32.0",
+    "jinja2>=3.1.4",
+    "markdown>=3.7",
+    "pyyaml>=6.0.2",
+    "httpx>=0.27.0",
+    "python-dotenv>=1.0.1",
+]
+
+[project.scripts]
+chip-design-agent = "app.main:run"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["app"]

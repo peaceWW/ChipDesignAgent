@@ -1,0 +1,446 @@
+part: digital-flow
+questions:
+  - id: q-spec-and-architecture-1
+    chapter: spec-and-architecture
+    type: single
+    question: 规格与架构设计最主要的产出是什么？
+    options:
+      - 已经布线完成的 GDS
+      - 可验证、可实现的功能/性能/接口约束，以及模块划分与微架构意图
+      - 量产测试程序的最终良率报告
+      - 仅有市场口号、没有任何接口定义
+    answer: 1
+    explanation: 规格回答「做什么、做到什么程度」，架构回答「用哪些块、如何互连与切拍」；它们是后续 RTL 与验证的合同。
+    difficulty: easy
+
+  - id: q-spec-and-architecture-2
+    chapter: spec-and-architecture
+    type: judge
+    question: 微架构只是把规格换个名字，不必决定流水级数、缓存层次或总线位宽。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 架构/微架构要把规格落到可实现结构：流水、存储层次、互连、时钟域和功耗策略，这些会直接改变面积与时序。
+    difficulty: easy
+
+  - id: q-spec-and-architecture-3
+    chapter: spec-and-architecture
+    type: single
+    question: 为什么规格阶段就要选定关键协议和性能档，而不是等 RTL 写完再选？
+    options:
+      - 协议只影响丝印颜色
+      - 协议决定 IP 清单、管脚、封装、时钟和功耗，晚改会推翻架构
+      - RTL 写完后工具会自动生成所有高速 PHY
+      - 规格不能包含接口，否则无法验证
+    answer: 1
+    explanation: 接口与吞吐是架构边界条件；PCIe/LPDDR 等选择会连锁改变封装和电源域，必须前移到规格。
+    difficulty: easy
+
+  - id: q-spec-and-architecture-4
+    chapter: spec-and-architecture
+    type: scenario
+    question: 规格写「尽量快、尽量省电、接口以后再定」。架构师最应该怎么做？
+    options:
+      - 直接开写全部 RTL，用综合结果反推规格
+      - 要求把吞吐、功耗、延迟和必须/可选接口量化成可验收指标，再做模块划分
+      - 忽略功耗，只保证主频数字好看
+      - 把未定接口全部绑成同一时钟域以简化问题
+    answer: 1
+    explanation: 不可验收的规格无法驱动微架构权衡；先量化再划分，才能进入 RTL 而不反复推倒。
+    difficulty: medium
+
+  - id: q-rtl-coding-1
+    chapter: rtl-coding
+    type: single
+    question: RTL（寄存器传输级）描述的核心对象是？
+    options:
+      - 晶体管的掺杂浓度曲线
+      - 时钟拍之间数据如何被计算并写入寄存器
+      - 光刻胶的显影时间
+      - 操作系统的线程调度算法
+    answer: 1
+    explanation: RTL 用硬件语言描述组合计算与寄存更新，是数字前端的主输入，不是器件物理或软件 OS。
+    difficulty: easy
+
+  - id: q-rtl-coding-2
+    chapter: rtl-coding
+    type: judge
+    question: 只要仿真能出波形，任意使用延迟语句、初值和不定周期等待的代码都一定能被综合成同样行为的门级网表。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 可综合子集远小于可仿真子集；仿真专用写法会导致综合推断锁存器、优化掉逻辑或行为不一致。
+    difficulty: easy
+
+  - id: q-rtl-coding-3
+    chapter: rtl-coding
+    type: single
+    question: 写 RTL 时「该算的组合、该记的寄存」分不清，最常见的后果是？
+    options:
+      - 晶圆厂会自动插入缺失的触发器
+      - 出现毛刺、推断锁存器或仿真与综合不一致
+      - 静态时序分析会变得不必要
+      - 封装引脚数量会自动减半
+    answer: 1
+    explanation: 组合与时序边界是 RTL 质量的第一刀；分不清会把时序问题和非确定性带进网表。
+    difficulty: easy
+
+  - id: q-rtl-coding-4
+    chapter: rtl-coding
+    type: scenario
+    question: 同事用 always 块写了一个本该同步复位的计数器，却在敏感列表里只写了数据输入、没写时钟。评审应指出什么？
+    options:
+      - 没有问题，综合会把任何 always 都映射成触发器
+      - 这更像电平敏感行为，容易综合出锁存器或纯组合，与「沿触发计数」意图不符
+      - 没写时钟反而更快，因为少了一条路径
+      - 复位可以完全省略，上电随机值就是特性
+    answer: 1
+    explanation: 时序逻辑必须明确时钟沿与复位语义；敏感列表/always 类型写错会改变电路类别。
+    difficulty: medium
+
+  - id: q-functional-verification-1
+    chapter: functional-verification
+    type: single
+    question: 功能验证要回答的核心问题是？
+    options:
+      - 芯片光罩对准精度是否达到纳米
+      - RTL 是否在约定场景下符合规格，并用覆盖率证明激励不够偷懒
+      - 封装导热硅脂品牌是否进口
+      - 晶圆厂产能是否排上队
+    answer: 1
+    explanation: 验证建立「规格↔RTL」证据链：激励、检查、覆盖率；它不替代 STA、DRC 或量产测试。
+    difficulty: easy
+
+  - id: q-functional-verification-2
+    chapter: functional-verification
+    type: judge
+    question: 跑通一组定向用例且波形看起来合理，就可以宣布覆盖率为 100% 并关闭验证。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 定向用例容易漏边沿与组合爆炸空间；覆盖率（代码/功能）是衡量「还没练到的规格」的尺子，不是装饰。
+    difficulty: easy
+
+  - id: q-functional-verification-3
+    chapter: functional-verification
+    type: single
+    question: UVM 一类验证方法学在入门视角里最重要的价值是？
+    options:
+      - 自动完成布局布线
+      - 用可复用的激励、检查与环境结构，支撑大规模、可回归的功能验证
+      - 替代综合约束
+      - 生成光罩图形
+    answer: 1
+    explanation: 方法学解决的是验证工程化：可重组件、相位、记分板，而不是后端实现。
+    difficulty: easy
+
+  - id: q-functional-verification-4
+    chapter: functional-verification
+    type: scenario
+    question: 某模块定向测试全过，但功能覆盖显示「错误响应」仓为空，随后硅上客户真的打出非法地址。这说明什么？
+    options:
+      - 覆盖率报告可以忽略，因为定向已经全绿
+      - 验证计划没把异常规格变成必须命中的仓，通过不等于规格被练到
+      - 非法地址只能在封测阶段发现
+      - 综合工具会在网表里自动补错误响应
+    answer: 1
+    explanation: 场景题要检验「绿波形 ≠ 验证完成」；覆盖率空洞往往对应未测规格，会逃到硅上。
+    difficulty: medium
+
+  - id: q-synthesis-1
+    chapter: synthesis
+    type: single
+    question: 逻辑综合的输入输出，下列哪组最完整？
+    options:
+      - 输入 GDS，输出 C 源代码
+      - 输入 RTL、约束与工艺库，输出门级网表及时序/面积估计
+      - 输入比特流，输出规格书
+      - 输入封装图纸，输出验证平台
+    answer: 1
+    explanation: 综合把可综合 RTL 映射到标准单元，约束（时钟、IO、例外路径）与库共同决定结果质量。
+    difficulty: easy
+
+  - id: q-synthesis-2
+    chapter: synthesis
+    type: judge
+    question: 综合约束可以随便写松，因为静态时序分析会在后面自动把频率提高到规格值。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 约束是综合优化的目标函数；写错或过松会得到无法在目标频率下收敛的网表，STA 只能报告违例，不能无中生有余量。
+    difficulty: easy
+
+  - id: q-synthesis-3
+    chapter: synthesis
+    type: single
+    question: 综合后出现大量推断锁存器，优先应回看什么？
+    options:
+      - 晶圆厂的光刻机型号
+      - RTL 是否存在未完全赋值的组合分支或意图不清的电平敏感描述
+      - 封装丝印字体
+      - 销售合同付款方式
+    answer: 1
+    explanation: 推断锁存器是典型 RTL/综合语义问题，应回到编码风格和组合完整性，而不是先改工艺。
+    difficulty: easy
+
+  - id: q-synthesis-4
+    chapter: synthesis
+    type: scenario
+    question: 同一份 RTL，A 约束按 200MHz，B 约束按 50MHz。B 的面积更小且时序轻松。能否说 B 的网表「更好」因而可以交付 200MHz 规格？
+    options:
+      - 能，面积小的网表一定能跑更高频
+      - 不能，综合结果相对约束；B 并未被要求、也未被证明满足 200MHz
+      - 能，STA 对所有网表使用同一组无关约束
+      - 不能，因为综合从不会改变面积
+    answer: 1
+    explanation: 综合是约束驱动的优化。比较网表必须在同一规格下；低频优化出的电路不能直接宣称满足高频规格。
+    difficulty: medium
+
+  - id: q-sta-1
+    chapter: sta
+    type: single
+    question: 静态时序分析检查的是？
+    options:
+      - 每一条功能场景的仿真波形是否与黄金模型逐拍相等
+      - 在给定时钟与约束下，建立时间、保持时间等是否满足，而不依赖具体激励
+      - 晶圆缺陷密度的统计分布
+      - 软件驱动程序是否通过编译
+    answer: 1
+    explanation: STA 穷举时序路径而非功能场景；它回答「在时钟拍内能否稳定采样」，不回答「算的数对不对」。
+    difficulty: easy
+
+  - id: q-sta-2
+    chapter: sta
+    type: judge
+    question: 建立时间违例通常与周期太紧或组合路径太长有关，保持时间违例即使降频也往往还在，因为它看的是同一拍内的短路径。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 入门关键直觉：建立跟周期/长路径，保持跟短路径与时钟偏斜；降频救不了保持违例。
+    difficulty: easy
+
+  - id: q-sta-3
+    chapter: sta
+    type: single
+    question: 跨时钟域路径为什么不能指望默认 STA 自动保证正确？
+    options:
+      - STA 默认按同步时钟假设分析，跨域路径常被伪约束或排除，需要专门 CDC 方法
+      - STA 会自动插入异步 FIFO
+      - 跨域路径不存在亚稳态
+      - 保持时间对跨域永远不重要
+    answer: 0
+    explanation: STA 与 CDC 分工：STA 管同步域内时序，跨域要靠同步器/FIFO 和 CDC 检查，而不是假装它们是同一时钟。
+    difficulty: easy
+
+  - id: q-sta-4
+    chapter: sta
+    type: scenario
+    question: 芯片在实验室降频后功能正常，满频随机出错，STA 报告若干建立违例。最合理的解释是？
+    options:
+      - 一定是封装焊反了
+      - 长路径在满频周期内走不完，降频加大了周期所以侥幸通过
+      - 保持违例会随降频一起消失，所以一定是保持问题
+      - 功能验证全绿就不可能有时序问题
+    answer: 1
+    explanation: 建立违例的经典现场症状是「降频变好」；保持违例通常与频率关系弱。这也说明验证通过不能代替 STA。
+    difficulty: medium
+
+  - id: q-dft-1
+    chapter: dft
+    type: single
+    question: DFT 插入扫描链，主要是为了？
+    options:
+      - 让芯片在用户手机里自动升级 App
+      - 量产时能把内部触发器串起来施加/观察，以检测制造缺陷
+      - 替代所有功能验证用例
+      - 提高处理器的指令集兼容性
+    answer: 1
+    explanation: 扫描、BIST 等服务制造测试覆盖率和测试时间，对象是缺陷，不是规格功能本身。
+    difficulty: easy
+
+  - id: q-dft-2
+    chapter: dft
+    type: judge
+    question: DFT 可以完全放到流片之后再补，因为测试程序能穿透任意不可控内部状态。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 可测性必须在设计阶段插入；没有扫描/BIST 等结构，量产测试成本会爆、覆盖率上不去。
+    difficulty: easy
+
+  - id: q-dft-3
+    chapter: dft
+    type: single
+    question: 存储器 BIST 与逻辑扫描的分工，哪句正确？
+    options:
+      - 两者完全相同，只是名字不同
+      - 扫描面向触发器构成的逻辑，MBIST 面向规则存储阵列的高效测试
+      - BIST 只用于模拟运放
+      - 扫描只在 FPGA 比特流里存在
+    answer: 1
+    explanation: 存储阵列用 March 类算法经 BIST 更经济；随机逻辑靠扫描切分可控可观。
+    difficulty: easy
+
+  - id: q-dft-4
+    chapter: dft
+    type: scenario
+    question: 后端为了时序把部分扫描使能乱接，导致测试模式进不去。签核清单应如何看待？
+    options:
+      - 功能模式时序干净就可以流片，测试模式无所谓
+      - 测试模式也是签核对象：进不去扫描等于量产无法筛片
+      - DFT 只影响包装盒上的二维码
+      - 晶圆厂会用光学显微镜代替扫描测试
+    answer: 1
+    explanation: DFT 与物理设计互相约束；测试模式的时序、规则和故障覆盖是 tapeout 清单上的独立一栏。
+    difficulty: medium
+
+  - id: q-physical-design-1
+    chapter: physical-design
+    type: single
+    question: 物理设计（后端）典型顺序中，布局、时钟树综合（CTS）、布线的关系是？
+    options:
+      - 先布线再随便撒单元，最后不需要时钟
+      - 先放置标准单元，再构建时钟树，再完成信号布线并迭代违例
+      - 三者必须由晶圆厂手工完成，设计公司不参与
+      - CTS 发生在写规格之前
+    answer: 1
+    explanation: 后端把网表变成几何：floorplan/placement → CTS → route，并与时序、拥塞、DRC 闭环。
+    difficulty: easy
+
+  - id: q-physical-design-2
+    chapter: physical-design
+    type: judge
+    question: 时钟树综合的目标之一，是让时钟沿尽量同时到达各触发器，以控制偏斜对建立/保持的伤害。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: CTS 管理 skew 与 insertion delay，是数字后端的关键步骤，也是 STA 时钟模型的来源之一。
+    difficulty: easy
+
+  - id: q-physical-design-3
+    chapter: physical-design
+    type: single
+    question: 为什么物理设计必须使用 Foundry 的库和规则，而不是「画得下就行」？
+    options:
+      - 规则只影响 Logo 位置
+      - 间距、密度、天线等制造规则不满足则无法流片，库单元才是可制造的积木
+      - 后端可以发明自己的晶体管尺寸而不交 PDK
+      - 布线层数由市场部决定
+    answer: 1
+    explanation: 物理实现是在 PDK 契约上施工；DRC/LVS 相对的就是这套规则与原理图/网表。
+    difficulty: easy
+
+  - id: q-physical-design-4
+    chapter: physical-design
+    type: scenario
+    question: CTS 后保持违例大增，建立反而改善。更合理的第一反应是？
+    options:
+      - 立刻把主频再提高一倍
+      - 检查时钟偏斜、短路径和保持修复缓冲，而不是只加长周期
+      - 删除所有触发器
+      - 认为 STA 报告可以忽略
+    answer: 1
+    explanation: CTS 改变时钟到达时间，常暴露保持问题；保持靠缓冲/延迟单元和偏斜控制，不是靠降频叙事。
+    difficulty: medium
+
+  - id: q-signoff-tapeout-1
+    chapter: signoff-tapeout
+    type: single
+    question: 签核（signoff）在入门语境里指什么？
+    options:
+      - 市场部在海报上签字
+      - 时序、功耗、DRC/LVS、DFT、电气等检查达到可流片门槛，并冻结交付数据
+      - 随便导出一份网表就叫签核
+      - 只签核软件版本号
+    answer: 1
+    explanation: tapeout 是把签核通过的 GDS 等数据交给晶圆厂；签核是风险门槛，不是仪式性签字。
+    difficulty: easy
+
+  - id: q-signoff-tapeout-2
+    chapter: signoff-tapeout
+    type: judge
+    question: 流片成功等于量产成功：第一片能点亮，良率和封测问题都可以忽略。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 带回片点亮只是设计验证的开始；量产还要良率爬坡、测试程序、封装可靠性和复测。
+    difficulty: easy
+
+  - id: q-signoff-tapeout-3
+    chapter: signoff-tapeout
+    type: single
+    question: 封装与测试在流程中的位置，哪句正确？
+    options:
+      - 封装发生在写 RTL 之前
+      - 晶圆制造之后进行封装引出和测试筛片/标定，才能成为可出货器件
+      - 测试可以完全替代 DFT
+      - 封装与芯片设计数据无关
+    answer: 1
+    explanation: 设计→制造→封测是产业链大图；封装影响电气与热，测试依赖 DFT 与测试向量。
+    difficulty: easy
+
+  - id: q-signoff-tapeout-4
+    chapter: signoff-tapeout
+    type: scenario
+    question: 签核还剩 DRC 脏几百条、时序还有建立违例，但演示日期到了。哪项决策符合工程常识？
+    options:
+      - 直接 tapeout，靠晶圆厂「看情况修」
+      - 冻结风险清单：违例必须分类关闭或书面豁免，否则不交付 GDS
+      - 把违例从报告里删掉就算签核
+      - 只流片模拟部分，数字部分用 FPGA 焊在封装里冒充
+    answer: 1
+    explanation: 签核允许有记录的豁免，但不允许未分类的脏报告出厂；Foundry 不能替你修逻辑时序。
+    difficulty: medium
+
+  - id: q-digital-flow-exam-1
+    chapter: digital-flow-exam
+    type: scenario
+    question: 按主时间轴，一份「可流片数据包」至少应能回溯到哪些前置证据？
+    options:
+      - 只需一份漂亮架构 PPT
+      - 规格与架构、经过验证的 RTL、约束驱动的网表、STA/DFT/物理签核报告
+      - 只需 FPGA 点灯视频
+      - 只需采购订单
+    answer: 1
+    explanation: 综合考查流程闭环：每后一站都吃前一站的数据与证据，缺少验证或签核都不能叫可流片。
+    difficulty: medium
+
+  - id: q-digital-flow-exam-2
+    chapter: digital-flow-exam
+    type: single
+    question: 功能验证、STA、DFT 三者分别主要防哪类失败？
+    options:
+      - 验证防制造缺陷，STA 防规格误解，DFT 防建立违例
+      - 验证防功能不符规格，STA 防时序采样失败，DFT 防量产无法筛缺陷
+      - 三者完全重复，留一个即可
+      - 都只防封装焊盘氧化
+    answer: 1
+    explanation: 这是数字流程的三道不同闸门，入门必须能分开，不能用「仿真过了」代替另外两道。
+    difficulty: easy
+
+  - id: q-digital-flow-exam-3
+    chapter: digital-flow-exam
+    type: judge
+    question: 综合、STA、物理设计会反复迭代回 RTL 或约束，因此主时间轴是带闭环的，而不是一次性瀑布。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 流程图看起来单向，工程上时序/拥塞/可测性会打回；理解闭环才能理解为何架构决策要前移。
+    difficulty: easy
+
+  - id: q-digital-flow-exam-4
+    chapter: digital-flow-exam
+    type: single
+    question: 哪一项通常发生在逻辑综合之前而不是之后？
+    options:
+      - 时钟树综合与详细布线
+      - 规格、微架构与可综合 RTL、以及大部分功能验证规划
+      - GDS 签核
+      - 封装吸塑盘设计定型
+    answer: 1
+    explanation: 考流程位置：综合吃的是 RTL+约束+库；CTS/route/GDS 在其后。
+    difficulty: easy
+
+  - id: q-digital-flow-exam-5
+    chapter: digital-flow-exam
+    type: scenario
+    question: 项目同时出现：覆盖率空洞、建立违例、扫描链断裂。若只能按「先救哪个才有意义」排序，更合理的是？
+    options:
+      - 先 tapeout，三种问题硅上再说
+      - 先澄清规格与功能（否则修的是错误电路），并行收敛时序，并修复 DFT 否则无法量产
+      - 只修时序，功能错了也没关系
+      - 只补扫描，规格可以不要
+    answer: 1
+    explanation: 综合题：功能错则时序修的是错逻辑；时序不收则频率规格失败；DFT 坏则量产失败。需要同时看见三条线，而不是赌流片。
+    difficulty: medium

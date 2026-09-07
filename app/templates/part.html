@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+{% block title %}Part {{ part.no }} {{ part.title }} · {{ book.title }}{% endblock %}
+{% block content %}
+<article class="stack">
+  <p class="crumb"><a href="/">手册</a> / Part {{ part.no }}</p>
+  <h1>{{ part.title }}</h1>
+  <p class="lede">{{ part.summary }}</p>
+  <p class="muted">{{ part.chapters | length }} 章 · 约 {{ part.minutes }} 分钟
+    {% if mindmap %} · <a href="/mindmap/{{ mindmap.id }}">本篇思维导图</a>{% endif %}
+    {% if exam_count %} · <a href="/exam/{{ part.id }}">综合测验 {{ exam_count }} 题</a>{% endif %}
+  </p>
+  <ol class="chapter-list">
+    {% for chapter in part.chapters %}
+    <li>
+      <a href="/chapter/{{ chapter.id }}">
+        <span class="idx">{{ "%02d"|format(loop.index) }}</span>
+        <span>
+          <strong>{{ chapter.title }}</strong>
+          <small>{{ chapter.minutes }} 分钟 · {{ chapter.tags | join(" / ") }}</small>
+        </span>
+        <span class="marks">
+          {% if chapter.id in snap.reads %}<em>已读</em>{% endif %}
+          {% if chapter.id in snap.quizzes %}<em class="quiz">已测 {{ snap.quizzes[chapter.id].score }}/{{ snap.quizzes[chapter.id].total }}</em>{% endif %}
+        </span>
+      </a>
+    </li>
+    {% endfor %}
+  </ol>
+</article>
+{% endblock %}

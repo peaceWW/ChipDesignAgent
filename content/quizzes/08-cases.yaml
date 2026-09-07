@@ -1,0 +1,254 @@
+part: cases
+questions:
+  - id: q-mini-soc-walkthrough-1
+    chapter: mini-soc-walkthrough
+    type: single
+    question: 走读迷你 SoC 时，应沿哪条主路径把前面知识串起来？
+    options:
+      - 只看封装丝印
+      - CPU 取指 → 总线译码 → 存储/外设 → 时钟复位与启动代码
+      - 只看运放匹配
+      - 只看光罩层号
+    answer: 1
+    explanation: 迷你 SoC 是数字流程+模块+片上协议的汇合：没有启动路径就不叫系统。
+    difficulty: easy
+
+  - id: q-mini-soc-walkthrough-2
+    chapter: mini-soc-walkthrough
+    type: judge
+    question: 迷你 SoC 能取指跑空循环，就可以宣称外设、中断和跨时钟域都已经验证完毕。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 取指只证明存储和 CPU 的一条窄路；外设、中断、DMA 和 CDC 要另做走读。
+    difficulty: easy
+
+  - id: q-mini-soc-walkthrough-3
+    chapter: mini-soc-walkthrough
+    type: single
+    question: 走读地址映射时，最该对照哪三份东西？
+    options:
+      - 海报、名片、丝印
+      - 架构 memory map、总线译码 RTL/IP 配置、软件头文件基址
+      - 仅有晶圆厂宣传册
+      - 仅有 FPGA LUT 数量
+    answer: 1
+    explanation: 硬件译码与软件基址必须是同一张地图，否则「能编译」也会写到空洞。
+    difficulty: easy
+
+  - id: q-mini-soc-walkthrough-4
+    chapter: mini-soc-walkthrough
+    type: scenario
+    question: 走读发现 UART 挂在 APB，DMA 要搬环形缓冲到 UART。你应检查的关键积木是？
+    options:
+      - 只检查封装导热
+      - DMA 与 UART 的总线通路、FIFO 深度、中断/握手以及时钟域
+      - 只检查 HDMI PHY
+      - 只检查 HBM 堆叠
+    answer: 1
+    explanation: 案例要把模块（FIFO）和协议（APB/AXI）放回系统场景，而不是停在名词。
+    difficulty: medium
+
+  - id: q-fpga-blink-to-peripheral-1
+    chapter: fpga-blink-to-peripheral
+    type: single
+    question: 「从点灯到外设」这条练习链，后半段比点灯多出来的核心能力是？
+    options:
+      - 只会翻转一个 LED
+      - 约束真实时钟/IO、对接板级低速协议，并用 ILA/逻辑分析定位
+      - 完成 ASIC 全套 DFT 签核
+      - 绘制 FinFET 截面
+    answer: 1
+    explanation: 点灯证明工具链，外设证明约束、协议落地和板级调试。
+    difficulty: easy
+
+  - id: q-fpga-blink-to-peripheral-2
+    chapter: fpga-blink-to-peripheral
+    type: judge
+    question: 点灯工程里用内部振荡随便出个时钟，可以直接同样约束去跑 SPI 传感器而不改约束。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 外设对时钟质量和 IO 标准敏感；点灯时钟往往不满足协议时序。
+    difficulty: easy
+
+  - id: q-fpga-blink-to-peripheral-3
+    chapter: fpga-blink-to-peripheral
+    type: single
+    question: FPGA 练习接 I2C 传感器失败，排错顺序更合理的是？
+    options:
+      - 先怀疑光刻机
+      - 查管脚约束与上拉、控制器状态机、从地址，再用 ILA 看 SCL/SDA
+      - 先换先进纳米节点
+      - 先上 HBM
+    answer: 1
+    explanation: 案例把 FPGA 流程和板级协议叠在一起，排错要从可见的电气与寄存器开始。
+    difficulty: easy
+
+  - id: q-fpga-blink-to-peripheral-4
+    chapter: fpga-blink-to-peripheral
+    type: scenario
+    question: 学员点灯成功后直接例化「网上下载的 PCIe 核」想一次出图。教练最该提醒什么？
+    options:
+      - 没有问题，点灯等于高速签核
+      - 高速 PHY、时钟、板级走线和 IP 授权远超练习链，应先完成低速外设闭环
+      - PCIe 比 I2C 更简单
+      - 不需要比特流
+    answer: 1
+    explanation: 学习路径要爬坡：先闭环低速，再碰高速，避免在未建立约束纪律时吞最厚的 PHY。
+    difficulty: medium
+
+  - id: q-mixed-signal-teardown-1
+    chapter: mixed-signal-teardown
+    type: single
+    question: 拆解数模混合芯片时，最少应同时看到哪三块？
+    options:
+      - 只看数字网表
+      - 数字控制/接口、模拟前端或电源/时钟、以及协议如何落到管脚
+      - 只看封装贴纸
+      - 只看 FPGA 点灯视频
+    answer: 1
+    explanation: 混合拆解的目标是防止「只会讲数字或只会讲运放」。
+    difficulty: easy
+
+  - id: q-mixed-signal-teardown-2
+    chapter: mixed-signal-teardown
+    type: judge
+    question: 电源管理芯片里的数字状态机可以忽略上电顺序，因为 LDO 自己会知道该何时稳定。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 混合芯片的控制序列就是规格：开关顺序、隔离和故障保护都是数字-模拟合同。
+    difficulty: easy
+
+  - id: q-mixed-signal-teardown-3
+    chapter: mixed-signal-teardown
+    type: single
+    question: 拆解带 ADC 的传感芯片，协议落地更可能是哪句？
+    options:
+      - ADC 直接把连续电压接到 AXI 而不采样
+      - 模拟前端+ADC 出数字样本，经 SPI/I2C 等控制器送到 MCU，驱动再组帧
+      - 只有射频，没有数字接口
+      - 必须走 HBM
+    answer: 1
+    explanation: 案例把模拟模块和板级协议接起来：样本怎么离开芯片同样重要。
+    difficulty: easy
+
+  - id: q-mixed-signal-teardown-4
+    chapter: mixed-signal-teardown
+    type: scenario
+    question: 拆解报告只写了「有一个 12 位 ADC」，没写参考、时钟、隔离和数字接口。缺的是什么？
+    options:
+      - 已经足够做系统集成
+      - 精度与噪声预算、采样时钟质量、数字噪声隔离，以及样本如何被读走
+      - 只缺 Logo
+      - 只缺纳米节点
+    answer: 1
+    explanation: 拆解要写出交接面：模拟指标如何变成数字样本并离开芯片。
+    difficulty: medium
+
+  - id: q-learning-path-1
+    chapter: learning-path
+    type: single
+    question: 按本手册，自学第一条主线更合理的是？
+    options:
+      - 先背完全部协议字段附录
+      - 先建立分类与规格到量产地图，再选数字前端/验证、FPGA 或模拟之一深挖
+      - 先推导全部器件量子力学
+      - 先流片再看书
+    answer: 1
+    explanation: 路径章强调先地图后深挖，并与常见误区对齐。
+    difficulty: easy
+
+  - id: q-learning-path-2
+    chapter: learning-path
+    type: judge
+    question: 同时从零攻克先进工艺器件物理、全部高速协议字段和模拟版图匹配，是最高效的入门策略。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 并行堆深度会失焦；先一条主线拿到可以讲解的闭环，再横向扩展。
+    difficulty: easy
+
+  - id: q-learning-path-3
+    chapter: learning-path
+    type: single
+    question: 若主线选 FPGA，配套应优先练什么，而不是先做什么？
+    options:
+      - 优先练约束、板级外设与调试闭环；而不是先背光罩 OPC
+      - 优先练 FinFET 掺杂配方
+      - 优先写量产测试向量全集
+      - 优先做晶圆厂商务谈判
+    answer: 0
+    explanation: 路径与器件一致：FPGA 主线吃工具流和板级，ASIC 签核可以后置理解。
+    difficulty: easy
+
+  - id: q-learning-path-4
+    chapter: learning-path
+    type: scenario
+    question: 读者已经能讲清 AXI 与 I2C 的落地差异，但分不清建立/保持。下一步补哪一篇更急？
+    options:
+      - 继续堆更多无线缩写
+      - 回到数字流程的 STA 与模块篇的时钟/触发器，否则协议控制器也不可靠
+      - 先学光罩报价心理
+      - 先改封装颜色
+    answer: 1
+    explanation: 路径是查缺：流程洞比再背一个协议名更致命。
+    difficulty: medium
+
+  - id: q-cases-exam-1
+    chapter: cases-exam
+    type: scenario
+    question: 用三个案例分别对应手册的三条骨架，哪组匹配正确？
+    options:
+      - 迷你 SoC→只练模拟匹配；FPGA 外设→只练光罩；混合拆解→只练 AXI
+      - 迷你 SoC→数字流程+片上模块/总线；FPGA 链→可重配流程+板级协议；混合拆解→模拟思维+接口落地
+      - 三个案例都只练丝印
+      - 三个案例都替代签核
+    answer: 1
+    explanation: 篇末综合：案例是把流程/模块/协议重新咬合的三种姿势。
+    difficulty: medium
+
+  - id: q-cases-exam-2
+    chapter: cases-exam
+    type: single
+    question: 走读任何芯片案例时，建议固定问的三个问题是？
+    options:
+      - Logo、代言人、股价
+      - 它在流程的哪一站、内部用了哪些积木、对外协议如何分成 Controller 与 PHY
+      - 只有纳米数字
+      - 只有主频广告
+    answer: 1
+    explanation: 这是全书阅读方法：流程、模块、协议三问。
+    difficulty: easy
+
+  - id: q-cases-exam-3
+    chapter: cases-exam
+    type: judge
+    question: 案例走读的目标是能开口讲故事，而不是交付可流片工程或可量产测试程序。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 手册定位是入门地图；案例服务理解，不伪装成项目交付。
+    difficulty: easy
+
+  - id: q-cases-exam-4
+    chapter: cases-exam
+    type: single
+    question: 完成自学路线后，若要向别人解释「一颗芯片怎么做出来」，最低完整度应包含？
+    options:
+      - 只会说「先写软件」
+      - 规格到签核流片封测、关键数字积木、以及协议在硅上的三段落地
+      - 只会背一个节点数字
+      - 只会点一个 LED
+    answer: 1
+    explanation: 与全书目标对齐：开口讲清流程、模块、协议。
+    difficulty: easy
+
+  - id: q-cases-exam-5
+    chapter: cases-exam
+    type: scenario
+    question: 你要带新人一周入门。按案例篇，七天节奏哪项更合理？
+    options:
+      - 第一天背完所有规范附录，其余六天放假
+      - 先全景+数字流程地图，再用迷你 SoC 走读串模块与 AXI，用 FPGA 点灯到 I2C 建立手感，最后拆一颗混合芯片并订主线
+      - 七天只做运放公式
+      - 七天只比较封装颜色
+    answer: 1
+    explanation: 路径必须可执行：地图 → 数字系统 → 可上手 FPGA → 混合视野 → 选主线。
+    difficulty: medium

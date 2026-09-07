@@ -1,0 +1,54 @@
+{% extends "base.html" %}
+{% block title %}{{ chapter.title }} · {{ book.title }}{% endblock %}
+{% block content %}
+<div class="reader">
+  <aside class="toc">
+    <p class="toc-kicker">Part {{ part.no }} {{ part.title }}</p>
+    <ol>
+      {% for item in part.chapters %}
+      <li class="{% if item.id == chapter.id %}on{% endif %}">
+        <a href="/chapter/{{ item.id }}">{{ item.title }}</a>
+      </li>
+      {% endfor %}
+    </ol>
+    <a class="toc-back" href="/part/{{ part.id }}">返回本篇目录</a>
+  </aside>
+  <article class="prose" data-chapter="{{ chapter.id }}">
+    <p class="crumb"><a href="/">手册</a> / <a href="/part/{{ part.id }}">{{ part.title }}</a></p>
+    <h1>{{ chapter.title }}</h1>
+    <p class="muted">第 {{ chapter.index + 1 }} 章 · {{ chapter.minutes }} 分钟
+      {% if chapter.tags %} · {{ chapter.tags | join(" · ") }}{% endif %}
+    </p>
+    {% if prereqs %}
+    <p class="prereq">建议先读：
+      {% for pre in prereqs %}
+      <a href="/chapter/{{ pre.id }}">{{ pre.title }}</a>{% if not loop.last %}、{% endif %}
+      {% endfor %}
+    </p>
+    {% endif %}
+    {{ html | safe }}
+    <nav class="pager">
+      {% if prev %}<a href="/chapter/{{ prev.id }}">上一章：{{ prev.title }}</a>{% else %}<span></span>{% endif %}
+      {% if next %}<a href="/chapter/{{ next.id }}">下一章：{{ next.title }}</a>{% endif %}
+    </nav>
+    <section class="quiz" id="quiz" data-chapter="{{ chapter.id }}">
+      <h2>章末自测</h2>
+      <p class="muted">答完自动判分，用来检验「概念 / 作用 / 场景」是否记住。</p>
+      {% if quiz_result %}
+      <p class="quiz-score">上次成绩 {{ quiz_result.score }} / {{ quiz_result.total }}</p>
+      {% endif %}
+      {% for q in questions %}
+      <fieldset class="q" data-id="{{ q.id }}">
+        <legend>{{ loop.index }}. {{ q.question }} <small>{{ q.type }} · {{ q.difficulty }}</small></legend>
+        {% for opt in q.options %}
+        <label><input type="radio" name="{{ q.id }}" value="{{ loop.index0 }}"> {{ opt }}</label>
+        {% endfor %}
+        <div class="feedback" hidden></div>
+      </fieldset>
+      {% endfor %}
+      <button type="button" class="primary" id="submit-quiz">提交本章测验</button>
+      <p id="quiz-summary" class="quiz-score" hidden></p>
+    </section>
+  </article>
+</div>
+{% endblock %}

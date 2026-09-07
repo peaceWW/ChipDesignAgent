@@ -1,0 +1,302 @@
+part: analog
+questions:
+  - id: q-analog-vs-digital-1
+    chapter: analog-vs-digital
+    type: single
+    question: 模拟设计相对数字设计，目标函数最主要的转变是？
+    options:
+      - 从「逻辑是否符合规格」转到噪声、匹配、线性度、稳定性和连续量精度
+      - 从关注电压转到只关注布尔代数
+      - 模拟不再需要仿真
+      - 模拟不需要版图
+    answer: 0
+    explanation: 思维差异是本篇入口：连续量没有「绝对的 0/1 余量」，必须显式管理误差与稳定性。
+    difficulty: easy
+
+  - id: q-analog-vs-digital-2
+    chapter: analog-vs-digital
+    type: judge
+    question: 混合信号芯片可以只用数字功能仿真收工，因为 ADC 在仿真里输出的是整数。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 整数接口不能代替对采样、参考、时钟抖动和电源抑制的模拟分析；数模交接处最容易误判。
+    difficulty: easy
+
+  - id: q-analog-vs-digital-3
+    chapter: analog-vs-digital
+    type: single
+    question: 数字工程师理解模拟思维，最低限度应建立哪条直觉？
+    options:
+      - 所有模拟问题都能用更高主频解决
+      - 版图寄生、失配和噪声会改变「原理图看起来正确」的电路
+      - 模拟模块没有规格
+      - PDK 只对数字有效
+    answer: 1
+    explanation: 入门不是要求会画运放，而是知道为何混合信号不能把模拟当黑盒布尔器件。
+    difficulty: easy
+
+  - id: q-analog-vs-digital-4
+    chapter: analog-vs-digital
+    type: scenario
+    question: 数字侧看到 ADC 输出偶发跳码，第一反应是改状态机。更完整的思路是？
+    options:
+      - 状态机一定是唯一原因
+      - 同时怀疑参考抖动、时钟质量、电源耦合和输入摆幅，而不是只改数字控制
+      - ADC 输出跳码在模拟里不存在
+      - 提高数字频率就能滤掉所有模拟噪声
+    answer: 1
+    explanation: 混合信号排错必须跨思维：数字症状可能来自模拟完整性。
+    difficulty: medium
+
+  - id: q-analog-blocks-1
+    chapter: analog-blocks
+    type: single
+    question: 运放、LDO、ADC/DAC、PLL 在 SoC 里分别最常扮演？
+    options:
+      - 运放做光刻，LDO 做扫描，ADC 做封装
+      - 放大/缓冲、供电、数模世界的桥梁、时钟生成与净化
+      - 全部只用于存储器内部门控
+      - 全部可用一条 AXI 总线替代
+    answer: 1
+    explanation: 常用模块要能对上系统职责：感知链路、电源、转换器、时钟。
+    difficulty: easy
+
+  - id: q-analog-blocks-2
+    chapter: analog-blocks
+    type: judge
+    question: PLL 的典型职责包括把参考时钟倍频/净化后送给数字与高速接口，它的抖动会进入下游时序与误码。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 时钟是模拟与数字的交界；PLL 规格不是「有波形」就够。
+    difficulty: easy
+
+  - id: q-analog-blocks-3
+    chapter: analog-blocks
+    type: single
+    question: LDO 相对「只在数字里做时钟门控」，多解决的是哪类问题？
+    options:
+      - 指令集兼容
+      - 给敏感模拟或 IO 提供较干净的本地电压
+      - 自动布局标准单元
+      - 生成扫描向量
+    answer: 1
+    explanation: 电源完整性是模拟模块的主场之一；门控省的是翻转，不是电源纹波。
+    difficulty: easy
+
+  - id: q-analog-blocks-4
+    chapter: analog-blocks
+    type: scenario
+    question: 传感器通路：微弱信号 → 要进 MCU。模块链更合理的是？
+    options:
+      - 直接把天线焊到 GPIO 当 ADC
+      - 前端放大/滤波 → ADC → 数字处理，必要时加基准与 LDO
+      - 只用 ROM 查表代替采样
+      - 先接 PCIe PHY 再放大
+    answer: 1
+    explanation: 模块题强调链路：放大、转换、基准和供电缺一就会在精度上失败。
+    difficulty: medium
+
+  - id: q-simulation-types-1
+    chapter: simulation-types
+    type: single
+    question: DC、AC、Transient 三类模拟仿真分别优先回答什么？
+    options:
+      - DC 看眼图，AC 看直流工作点，Transient 看工艺角名词
+      - DC 找偏置工作点，AC 看频响与相位裕度，Transient 看建立、过冲与启停
+      - 三者完全等价，只跑一种即可
+      - 都只用于数字门级仿真
+    answer: 1
+    explanation: 仿真类型按问题选刀，不是按软件菜单随便点。
+    difficulty: easy
+
+  - id: q-simulation-types-2
+    chapter: simulation-types
+    type: judge
+    question: 噪声分析和蒙特卡洛主要用于评估随机噪声与失配，而不是替代 DC 去找第一个工作点。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 先有合理工作点，再谈小信号、瞬态和统计；顺序反了会得到无意义曲线。
+    difficulty: easy
+
+  - id: q-simulation-types-3
+    chapter: simulation-types
+    type: single
+    question: 只做典型工艺角的 Transient「看起来稳定」，为什么还不够签核模拟模块？
+    options:
+      - 因为已经足够，统计只是装饰
+      - 失配、温度电压角落和稳定性裕度可能在边角失败
+      - Transient 不能显示任何时间波形
+      - 模拟签核只看封装颜色
+    answer: 1
+    explanation: 模拟验证是角落与统计的艺术；典型波形是起点不是终点。
+    difficulty: easy
+
+  - id: q-simulation-types-4
+    chapter: simulation-types
+    type: scenario
+    question: 运放在 DC 能偏置，AC 显示相位裕度很差。若直接流片，最可能的系统症状是？
+    options:
+      - 数字扫描链变长
+      - 闭环振荡或长时间振铃，ADC/电源等后级被带崩
+      - 主频广告值自动提高
+      - GDS 文件变小
+    answer: 1
+    explanation: AC 稳定性是闭环模块的关键；DC 有工作点不等于能动态收敛。
+    difficulty: medium
+
+  - id: q-layout-matching-1
+    chapter: layout-matching
+    type: single
+    question: 模拟版图强调匹配，是因为？
+    options:
+      - 匹配只影响丝印对称美
+      - 失配会变成失调、非线性或电流镜误差，对称/共心等手法用来压这种误差
+      - 数字标准单元不需要任何几何规则
+      - 匹配可以代替所有仿真
+    answer: 1
+    explanation: 版图是电路的一部分；匹配是模拟版图的第一纪律。
+    difficulty: easy
+
+  - id: q-layout-matching-2
+    chapter: layout-matching
+    type: judge
+    question: 寄生电容电阻抽取可忽略，因为原理图仿真已经包含了所有连线效应。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 原理图理想连线；高速或高阻节点上，寄生会改带宽、稳定性和匹配。
+    difficulty: easy
+
+  - id: q-layout-matching-3
+    chapter: layout-matching
+    type: single
+    question: 保护环与隔离在混合信号芯片里主要防什么？
+    options:
+      - 防止数字切换噪声耦合进敏感模拟
+      - 防止软件编译失败
+      - 防止地址映射写错
+      - 防止比特流丢失
+    answer: 0
+    explanation: 数字是吵的，模拟是怕吵的；隔离是集成策略，不只是画框。
+    difficulty: easy
+
+  - id: q-layout-matching-4
+    chapter: layout-matching
+    type: scenario
+    question: 两个电流镜晶体管面积相同但朝向和周围环境不同，仿真匹配很好、硅上失调爆。优先怀疑？
+    options:
+      - 功能验证覆盖率
+      - 版图未做共心/同朝向/虚拟器件，制造梯度被不对称地吃进了器件
+      - AXI 总线位宽
+      - FPGA 的 LUT 配置
+    answer: 1
+    explanation: 「仿真好看、硅上飘」是匹配与应力/梯度的经典课。
+    difficulty: medium
+
+  - id: q-pdk-process-1
+    chapter: pdk-process
+    type: single
+    question: PDK 对设计者意味着什么？
+    options:
+      - 一份市场宣传册
+      - 晶圆厂提供的器件模型、设计规则、层定义和常配套的单元/编译器，是可制造设计的契约
+      - 只包含操作系统驱动
+      - 与工艺无关的通用 Spice 理想源
+    answer: 1
+    explanation: 没有 PDK，仿真和版图都对不准将要制造的那条线。
+    difficulty: easy
+
+  - id: q-pdk-process-2
+    chapter: pdk-process
+    type: judge
+    question: 特色工艺（高压、BCD、射频）与先进逻辑节点是同一把尺子，选越小纳米就越适合功率和高压。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 工艺要按器件需求选：高压/功率/射频常常留在成熟或特色平台，而不是盲目追先进逻辑节点。
+    difficulty: easy
+
+  - id: q-pdk-process-3
+    chapter: pdk-process
+    type: single
+    question: 为什么换 Foundry 或换节点几乎等于换项目假设？
+    options:
+      - 只是改个文件夹名
+      - 模型、规则、库、IO 和可量测器件都变，数字后端与模拟设计都要重做
+      - RTL 功能会自动保持时序
+      - 封装不受电气影响
+    answer: 1
+    explanation: PDK 是契约；换契约就要重新签核，不是重新编译一下软件。
+    difficulty: easy
+
+  - id: q-pdk-process-4
+    chapter: pdk-process
+    type: scenario
+    question: 团队想在先进 FinFET 上做高压电机驱动。更合理的判断是？
+    options:
+      - FinFET 纳米数字小，一定更耐压
+      - 高压功率更可能需要特色/成熟高压工艺，先进逻辑节点并不自动提供耐压与电流能力
+      - 只要有 PDK 就能把 1V 核晶体管当 600V 用
+      - 电机驱动不需要任何功率器件
+    answer: 1
+    explanation: 工艺常识题：节点营销 ≠ 器件物理；应用类别决定工艺家族。
+    difficulty: medium
+
+  - id: q-analog-exam-1
+    chapter: analog-exam
+    type: scenario
+    question: 用一条链路串起本篇：从思维到量产，模拟模块要经过哪些门？
+    options:
+      - 只写 RTL 再综合
+      - 选对连续量指标 → 选模块 → 按问题类型仿真 → 匹配版图与寄生 → 在正确 PDK/工艺上签核
+      - 只做 FPGA 点灯
+      - 只做扫描 DFT
+    answer: 1
+    explanation: 综合五章：思维、模块、仿真、版图、工艺契约。
+    difficulty: medium
+
+  - id: q-analog-exam-2
+    chapter: analog-exam
+    type: single
+    question: 数字流程里的「功能仿真全绿」对应到模拟，最容易被误当成什么？
+    options:
+      - 已经覆盖噪声、失配、稳定性和角落
+      - 只证明了某种激励下的一种行为切片，远不是模拟签核
+      - 等价于 LVS 通过
+      - 等价于良率达标
+    answer: 1
+    explanation: 跨篇对比：数字绿波形 ≠ 模拟可流片。
+    difficulty: easy
+
+  - id: q-analog-exam-3
+    chapter: analog-exam
+    type: judge
+    question: ADC/DAC 和 PLL 是典型的数模交接模块：一边是数字控制/数据，一边是连续电压或时钟质量。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 模块分类与混合信号系统观，是后文协议 PHY 的伏笔。
+    difficulty: easy
+
+  - id: q-analog-exam-4
+    chapter: analog-exam
+    type: single
+    question: 版图匹配与 PDK 规则同时失败时，应如何理解两者关系？
+    options:
+      - 匹配手法可以违反 DRC
+      - 先满足可制造规则，再在规则内做匹配与隔离；两者都要过
+      - PDK 规则只服务数字
+      - 匹配通过就可以忽略短路
+    answer: 1
+    explanation: 可制造是底线，匹配是性能；不能互相豁免。
+    difficulty: easy
+
+  - id: q-analog-exam-5
+    chapter: analog-exam
+    type: scenario
+    question: 一颗电源管理混合芯片：数字状态机控制多路 LDO。拆解时应同时列出哪些检查？
+    options:
+      - 只列 AXI 覆盖率
+      - 数字控制序列、电源域开关顺序、LDO 稳定/负载瞬态、版图隔离与 PDK 高压规则
+      - 只列 FPGA LUT 利用率
+      - 只列协议字段附录
+    answer: 1
+    explanation: 案例预演：混合芯片必须同时看到数字控制与模拟电源完整性。
+    difficulty: medium

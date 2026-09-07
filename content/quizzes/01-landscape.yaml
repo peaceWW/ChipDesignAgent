@@ -1,0 +1,350 @@
+part: landscape
+questions:
+  - id: q-what-is-a-chip-1
+    chapter: what-is-a-chip
+    type: single
+    question: 一款手机应用处理器把 CPU、GPU、ISP 和存储控制器做进同一颗硅片，它首先应被称为？
+    options:
+      - 通用分立晶体管阵列
+      - 系统级芯片 SoC
+      - 纯模拟运算放大器
+      - 仅含查找表的可编程逻辑
+    answer: 1
+    explanation: SoC 强调把处理器、互连和外设集成到同一颗硅片，形成缩微系统；ASIC 是更宽的「专用定制」标签，本题描述的是系统级集成。
+    difficulty: easy
+
+  - id: q-what-is-a-chip-2
+    chapter: what-is-a-chip
+    type: judge
+    question: FPGA 出厂时电路功能已经锁死，和量产 ASIC 一样不能再改配置。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: FPGA 用查找表和可编程互连实现可重配逻辑，改比特流就能改功能；ASIC 流片后功能基本固定。
+    difficulty: easy
+
+  - id: q-what-is-a-chip-3
+    chapter: what-is-a-chip
+    type: single
+    question: 数字 ASIC 与 FPGA 在「最终交付物」上最关键的差别是？
+    options:
+      - ASIC 交付比特流，FPGA 必须定制每版光罩
+      - ASIC 通常交付光罩或晶圆上的固定电路，FPGA 交付可反复加载的比特流
+      - 两者都不经过综合，直接画版图
+      - 两者都必须为每一次功能改动重开光罩
+    answer: 1
+    explanation: ASIC/SoC 走流片，交付物是掩模/晶圆上的固定电路；FPGA 综合实现后生成比特流下载到器件，一般不必按功能定制光罩。
+    difficulty: easy
+
+  - id: q-what-is-a-chip-4
+    chapter: what-is-a-chip
+    type: scenario
+    question: 实验室要在两周内验证一套图像算法，量产与否未定，预算不允许流片。最合理的器件选择是？
+    options:
+      - 立刻流片定制 ASIC，以追求最终量产最低功耗
+      - 先用 FPGA 开发板做原型，确认算法和接口后再决定是否转 ASIC
+      - 只用功率 MOS 管搭建数字算法
+      - 先流片一颗纯存储芯片，再在封装里改逻辑
+    answer: 1
+    explanation: FPGA 适合快速、可反复改的原型；过早流片 ASIC 周期长、NRE 高，且规格未冻结时风险极大。
+    difficulty: medium
+
+  - id: q-industry-chain-1
+    chapter: industry-chain
+    type: single
+    question: Fabless 与 Foundry 的分工，下列哪一句最准确？
+    options:
+      - Fabless 负责晶圆制造，Foundry 负责写规格
+      - Fabless 做设计与实现数据，Foundry 按工艺把电路做到硅片上
+      - 两者都必须自建封测厂才能出货
+      - Foundry 负责编写应用软件，Fabless 只做封装
+    answer: 1
+    explanation: Fabless 定义功能并完成设计数据，Foundry 提供工艺与代工；封测通常再交给专业封测厂或 IDM 内部产线。
+    difficulty: easy
+
+  - id: q-industry-chain-2
+    chapter: industry-chain
+    type: judge
+    question: EDA 是芯片产品本身的一种，买到 EDA 许可就等于买到了可出货的硅片。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: EDA 是贯穿仿真、综合、布局布线与签核的软件工具链，不是芯片硅片；没有制造和封测，设计数据到不了顾客手里。
+    difficulty: easy
+
+  - id: q-industry-chain-3
+    chapter: industry-chain
+    type: single
+    question: 读到「某环节卡脖子」新闻时，入门者首先应判断卡在哪一类？
+    options:
+      - 只可能卡在消费品牌广告
+      - 设计能力、制造产能/材料/光刻、封测，或高端 EDA/IP
+      - 只可能卡在操作系统桌面主题
+      - 只可能卡在包装纸箱印刷
+    answer: 1
+    explanation: 产业链风险分布在设计、先进制程与材料、封测、以及高端 EDA/核心 IP；先定位环节，才不会把不同瓶颈混为一谈。
+    difficulty: easy
+
+  - id: q-industry-chain-4
+    chapter: industry-chain
+    type: scenario
+    question: 初创团队要做可穿戴 SoC，没有晶圆厂，希望把精力放在规格和算法。最合理的产业角色是？
+    options:
+      - 自建先进制程 IDM，同时做设计与全部制造
+      - 走 Fabless：外购 CPU/蓝牙 IP 和 EDA，流片与封测外包
+      - 只做封装厂，把电路设计交给整机品牌临时手绘
+      - 不需要 PDK，直接把 RTL 送去封测厂镀金
+    answer: 1
+    explanation: 典型初创走 Fabless，用商业 IP 与 EDA 完成设计，Foundry 流片、封测厂封装；自建 IDM 投资与周期都不现实。
+    difficulty: medium
+
+  - id: q-chip-taxonomy-1
+    chapter: chip-taxonomy
+    type: single
+    question: 按「信号形态」划分时，数字芯片与模拟芯片最核心的差别是？
+    options:
+      - 数字处理离散 0/1 并常用时钟对齐，模拟处理连续电压电流并关心噪声与匹配
+      - 数字只能做存储，模拟只能做处理器
+      - 数字不需要验证，模拟不需要版图
+      - 两者工具链完全相同，只是封装颜色不同
+    answer: 0
+    explanation: 分类首先看信号是离散逻辑还是连续量，这决定了 RTL/UVM 路径还是原理图/仿真/匹配路径。
+    difficulty: easy
+
+  - id: q-chip-taxonomy-2
+    chapter: chip-taxonomy
+    type: judge
+    question: SoC 是单一类别的替代词，一颗 SoC 不可能同时包含数字核、模拟外设和存储器。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 真实芯片常跨类；SoC 是多类模块的集成，MCU 就常带模拟外设与 Flash。先看「主业」，再看外设。
+    difficulty: easy
+
+  - id: q-chip-taxonomy-3
+    chapter: chip-taxonomy
+    type: single
+    question: 立项阶段为什么要先做芯片分类，而不是先比主频和位宽？
+    options:
+      - 分类决定工具链、岗位和验证方法，比错类会用错流程
+      - 主频数字越大就一定越先进，分类没有意义
+      - 分类只影响包装丝印，不影响设计
+      - 所有芯片都必须走同一套纯数字 UVM
+    answer: 0
+    explanation: 选错类别会导致数字团队去调运放或模拟团队去堆 UVM；规格阶段的分类是后续学习路径和团队配置的前提。
+    difficulty: easy
+
+  - id: q-chip-taxonomy-4
+    chapter: chip-taxonomy
+    type: scenario
+    question: 产品经理拿出三颗候选芯片：交换芯片、助听器 SoC、电机驱动功率芯片。你应如何开始竞品分析？
+    options:
+      - 直接比较三颗的主频，主频高者胜出
+      - 先按主业归类（数字交换 / 低功耗混合 / 功率），再在同类约束下比接口与工艺
+      - 一律按消费电子成本模型报价，忽略汽车或医疗约束
+      - 只看纳米节点，节点数字小就全面领先
+    answer: 1
+    explanation: 应用领域会改约束；先归类再比参数，才不会被规格表里的主频或节点数字带偏。
+    difficulty: medium
+
+  - id: q-roles-and-collaboration-1
+    chapter: roles-and-collaboration
+    type: single
+    question: 数字芯片项目里，前端、验证、后端大致分别守哪一段？
+    options:
+      - 前端写应用商店，验证做广告，后端做物流
+      - 前端把规格变成 RTL，验证证明功能意图，后端把网表变成可制造版图
+      - 后端只负责写 C 程序，前端只负责封装
+      - 三个岗位互不交接，各自流片
+    answer: 1
+    explanation: 协作按数据交接：RTL 与测试平台、网表与约束、GDS 与签核报告。DFT 常横跨前端插入与后端实现。
+    difficulty: easy
+
+  - id: q-roles-and-collaboration-2
+    chapter: roles-and-collaboration
+    type: judge
+    question: 功能验证工程师的核心产出是「把芯片布局布线完成」，而不是可回归的测试平台与覆盖率证据。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 布局布线属于物理设计/后端；验证产出激励、断言、覆盖率和缺陷证据，证明 RTL 符合规格。
+    difficulty: easy
+
+  - id: q-roles-and-collaboration-3
+    chapter: roles-and-collaboration
+    type: single
+    question: DFT 工程师最主要的价值是？
+    options:
+      - 把芯片主频尽量做得比规格高一倍
+      - 在设计阶段插入可测试结构，让量产能高效筛出制造缺陷
+      - 替代所有功能验证，不再需要仿真
+      - 只负责编写手机 App 界面
+    answer: 1
+    explanation: DFT（扫描、BIST 等）服务量产测试覆盖与成本，不是用来证明功能规格，也不能替代功能验证。
+    difficulty: easy
+
+  - id: q-roles-and-collaboration-4
+    chapter: roles-and-collaboration
+    type: scenario
+    question: 项目周会上，架构改了总线位宽，前端已改 RTL，后端仍按旧约束做时钟树。最可能的协作问题是？
+    options:
+      - 没有问题，后端不必知道规格变化
+      - 交接物（规格、约束、网表）没有同步，时序和管脚规划会按过期假设推进
+      - 只要验证还在跑旧用例，后端可以忽略位宽
+      - DFT 会自动把位宽改回去
+    answer: 1
+    explanation: 岗位协作靠同一份规格/约束/网表版本；架构变更必须同步到验证激励、综合约束和物理设计输入。
+    difficulty: medium
+
+  - id: q-spec-to-production-1
+    chapter: spec-to-production
+    type: single
+    question: 「从规格到量产」这条链，设计公司内部完成后，下一步通常交给谁？
+    options:
+      - 直接交给应用商店上架，无需硅片
+      - 把签核后的 GDS 交给晶圆厂流片，再送封测
+      - 把 RTL 源码直接交给封装厂镀铜
+      - 把功能仿真波形交给光刻机当光罩
+    answer: 1
+    explanation: 设计侧交付可制造数据（GDS 等）给 Foundry，晶圆再进入封装与测试，才能成为可出货器件。
+    difficulty: easy
+
+  - id: q-spec-to-production-2
+    chapter: spec-to-production
+    type: judge
+    question: 规格冻结可以无限延后到流片前一天，因为后端工具能自动补全所有未定义接口。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 规格决定架构、IP、管脚和验证范围；越晚冻结，返工从 RTL 一直打到封装，代价指数上升。
+    difficulty: easy
+
+  - id: q-spec-to-production-3
+    chapter: spec-to-production
+    type: single
+    question: 下列哪一组顺序更符合数字芯片从想法到出货的大图？
+    options:
+      - 封测 → 流片 → 写规格 → RTL
+      - 规格架构 → RTL与验证 → 综合后端签核 → 流片封测量产
+      - 只做量产测试，不需要设计数据
+      - 先量产再补验证
+    answer: 1
+    explanation: 大图是规格驱动实现，实现经签核才流片，硅片经封测才能量产；顺序颠倒会导致不可制造或不可验证。
+    difficulty: easy
+
+  - id: q-spec-to-production-4
+    chapter: spec-to-production
+    type: scenario
+    question: 带回片后发现某接口电气不符合规格，但功能仿真曾经全绿。这说明大图里缺了哪类闭环？
+    options:
+      - 只缺市场宣传文案
+      - 规格到实现/封装/板级的约束与签核不够，功能仿真不能覆盖电气与可制造性
+      - 功能仿真全绿就证明硅片一定合格，问题只可能在用户软件
+      - 晶圆厂会自动把规格改成与硅片一致
+    answer: 1
+    explanation: 功能仿真证明逻辑意图，不证明 IO 电气、封装和板级；签核、PHY/封装协同和测试计划必须接在流片之前。
+    difficulty: medium
+
+  - id: q-common-myths-1
+    chapter: common-myths
+    type: single
+    question: 「工艺节点数字越小，芯片就一定全面更好」这个说法错在哪里？
+    options:
+      - 没错，纳米数字是唯一性能指标
+      - 节点是营销尺子，应用约束、架构、功耗、成本和供货往往更决定成败
+      - 成熟制程无法做出任何数字电路
+      - 只有 3nm 才能做 UART
+    answer: 1
+    explanation: 入门误区之一是把节点当唯一标尺；大量消费与工业芯片在成熟制程上更合适。
+    difficulty: easy
+
+  - id: q-common-myths-2
+    chapter: common-myths
+    type: judge
+    question: 会点亮 FPGA 开发板上的 LED，就等于已经完成与 ASIC 同等严格的功能验证与可测试性设计。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 点灯只证明一条极窄通路；ASIC 还需要系统级验证、覆盖率、DFT、时序与物理签核，不能把 FPGA 演示等同量产就绪。
+    difficulty: easy
+
+  - id: q-common-myths-3
+    chapter: common-myths
+    type: single
+    question: 把 FPGA 当成「免费的 ASIC」最容易忽略哪一点？
+    options:
+      - FPGA 与 ASIC 的时序模型、功耗面积和交付物都不同，原型成功不自动等于可流片
+      - FPGA 完全不能实现任何数字逻辑
+      - ASIC 不能使用时钟
+      - 两者光罩成本完全相同
+    answer: 0
+    explanation: FPGA 适合降风险，但不能省略 ASIC 的约束、签核和成本模型；可重配换来的是面积与功耗代价。
+    difficulty: easy
+
+  - id: q-common-myths-4
+    chapter: common-myths
+    type: scenario
+    question: 新人计划「先背完所有协议字段再学流程」。按本手册的纠偏，更合理的学习顺序是？
+    options:
+      - 继续只背字段，流程可以流片当天再看
+      - 先建立器件分类与规格到量产地图，再按落地结构（Controller+PHY+驱动）学协议
+      - 先把 FinFET 量子公式推导完，再谈什么是芯片
+      - 只学封装丝印字体，不看设计
+    answer: 1
+    explanation: 常见误区是堆名词、不看位置。手册主张先地图后细节：分类、流程、模块，协议按硅上落地学，而不是先背规范附录。
+    difficulty: medium
+
+  - id: q-landscape-exam-1
+    chapter: landscape-exam
+    type: scenario
+    question: 某团队要做车规 MCU：自研内核周边、外购存储与通信 IP、成熟制程代工。用本篇语言描述其产业位置，哪句最完整？
+    options:
+      - 这是纯 Foundry 项目，设计公司不需要规格
+      - 这是 Fabless 数字/混合 SoC：分类上以处理器+外设为主，流程上要走规格到签核再流片封测
+      - 这是 FPGA 比特流产品，不必考虑 DFT 与封测
+      - 这是功率分立器件，不需要总线和验证
+    answer: 1
+    explanation: 综合分类（MCU/SoC）、角色（Fabless+IP+Foundry）和流程（规格到量产，车规还叠加安全与供货约束）。
+    difficulty: medium
+
+  - id: q-landscape-exam-2
+    chapter: landscape-exam
+    type: single
+    question: 把「什么是芯片 / 产业链 / 分类 / 岗位 / 规格到量产」串成一句话，最准确的是？
+    options:
+      - 先分清器件与主业，再认清谁设计谁制造，按岗位交接把规格做成可封测的硅片
+      - 先选最小纳米节点，岗位可以全部省略
+      - 先做封装丝印，再决定芯片类别
+      - 先量产，再补分类
+    answer: 0
+    explanation: 全景篇的主线就是：类型 → 分工 → 分类与岗位 → 大流程，避免一上来比参数。
+    difficulty: easy
+
+  - id: q-landscape-exam-3
+    chapter: landscape-exam
+    type: judge
+    question: 同一颗产品芯片可以同时被说成 SoC（集成形态）、数字+模拟混合（信号形态）和车规器件（应用约束），这些标签并不互斥。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 分类是多把尺子：集成度、信号形态、职责、应用领域可以叠加，入门要会同时使用而不是只选一个词。
+    difficulty: easy
+
+  - id: q-landscape-exam-4
+    chapter: landscape-exam
+    type: single
+    question: 高校用 MPW 验证想法，与公司量产流片相比，最关键的差异是？
+    options:
+      - MPW 把多项目拼到同一套光罩/晶圆以降成本，目标是验证而不是立刻规模出货
+      - MPW 不需要任何设计数据
+      - 量产流片不需要封测
+      - MPW 只能做模拟，不能做数字
+    answer: 0
+    explanation: MPW 是产业链上的低成本验证路径；量产还要良率、复测、封装定型和供应链。
+    difficulty: medium
+
+  - id: q-landscape-exam-5
+    chapter: landscape-exam
+    type: scenario
+    question: 媒体说「国产替代取得突破」，但没说是 EDA、IP、成熟制程还是先进封装。你读完本篇后应如何解读？
+    options:
+      - 一律理解为已经全面超越所有先进制程
+      - 先追问突破发生在设计、制造、封测还是工具/IP，再判断能支撑哪类芯片
+      - 只要出现「芯片」二字就等于 SoC 已经量产
+      - 突破与分类、流程无关，不必追问
+    answer: 1
+    explanation: 全景能力就是把新闻还原到产业链环节和芯片类别，避免把局部突破听成全栈胜利。
+    difficulty: medium

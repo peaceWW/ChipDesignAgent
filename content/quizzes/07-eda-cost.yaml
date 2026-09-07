@@ -1,0 +1,254 @@
+part: eda-cost
+questions:
+  - id: q-eda-toolchain-1
+    chapter: eda-toolchain
+    type: single
+    question: EDA 工具链在数字项目里覆盖的典型角色是？
+    options:
+      - 只画市场海报
+      - 仿真验证、综合、时序、DFT、物理实现与签核，并嵌入 IP 与工艺库
+      - 替代晶圆厂光刻
+      - 只编译手机 App
+    answer: 1
+    explanation: EDA 是设计到签核的软件基础设施，不是硅片本身，也不是制造设备。
+    difficulty: easy
+
+  - id: q-eda-toolchain-2
+    chapter: eda-toolchain
+    type: judge
+    question: 三大 EDA 厂商工具常常按流程拼在一起使用，因此「会用一个仿真器」不等于掌握整条签核链。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 工具按站点分工；数据格式和约束要在站点间交接，入门要建立地图而不是只认一个 GUI。
+    difficulty: easy
+
+  - id: q-eda-toolchain-3
+    chapter: eda-toolchain
+    type: single
+    question: 为什么说 IP 与 EDA 是绑在一起的？
+    options:
+      - IP 不需要模型
+      - 可综合/可验证/可实现的 IP 必须带视图：仿真模型、时序库、版图抽象等，交给对应工具
+      - EDA 会自动发明 CPU 指令集
+      - 买了工具就自带无限免费核授权
+    answer: 1
+    explanation: IP 交付物是给工具链吃的视图；缺视图就无法集成或签核。
+    difficulty: easy
+
+  - id: q-eda-toolchain-4
+    chapter: eda-toolchain
+    type: scenario
+    question: 团队只有功能仿真器，没有综合与签核工具，却承诺「下月量产」。缺口在哪？
+    options:
+      - 没有缺口，仿真器能出 GDS
+      - 缺少把 RTL 变成可制造数据并证明时序/DRC/DFT 的工具与流程
+      - 只缺包装盒
+      - 仿真器可以代替 Foundry
+    answer: 1
+    explanation: 工具链完整性决定你能走到哪一站；只有仿真停在「功能可能对」。
+    difficulty: medium
+
+  - id: q-process-nodes-1
+    chapter: process-nodes
+    type: single
+    question: 「7nm/28nm」这类节点数字，入门最该建立的正确理解是？
+    options:
+      - 它等于晶体管边长的精确测量，可在显微镜下直接量出
+      - 它是工艺世代的营销/对比尺子，不自动等于全面性能或更适合所有应用
+      - 数字越小就越适合高压功率
+      - 只有 3nm 才能做 GPIO
+    answer: 1
+    explanation: 节点是世代标签；真实能力看器件结构、金属层、电压和库，而不是口号数字。
+    difficulty: easy
+
+  - id: q-process-nodes-2
+    chapter: process-nodes
+    type: judge
+    question: FinFET 相对传统平面工艺，主要画像是更好的短沟道控制与性能功耗，但成本和设计复杂度通常更高。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 结构世代有代价；不是所有产品都值得上 FinFET。
+    difficulty: easy
+
+  - id: q-process-nodes-3
+    chapter: process-nodes
+    type: single
+    question: 成熟平面工艺仍然大量存在的原因是？
+    options:
+      - 它们无法做任何数字电路
+      - 成本、供货、高压/模拟/嵌入式非易失等约束，往往比「更小纳米」更重要
+      - 国际标准禁止使用成熟制程
+      - 成熟制程没有 PDK
+    answer: 1
+    explanation: 工艺选择是产品题：很多 MCU、电源、显示驱动留在成熟或特色节点。
+    difficulty: easy
+
+  - id: q-process-nodes-4
+    chapter: process-nodes
+    type: scenario
+    question: 规格是超低成本工控 MCU，主频几十兆，混有高压 IO。更合理的节点策略是？
+    options:
+      - 必须追最先进 FinFET 以「看起来高端」
+      - 选成熟/特色工艺，把钱花在外设、可靠性和供货年限
+      - 节点可以不选，直接画理想晶体管
+      - 先流片 3nm 再降压当 5V GPIO
+    answer: 1
+    explanation: 节点要匹配电压、成本和产量，而不是匹配新闻标题。
+    difficulty: medium
+
+  - id: q-foundry-pdk-1
+    chapter: foundry-pdk
+    type: single
+    question: Foundry 与设计公司之间最关键的技术契约是？
+    options:
+      - 口头约定晶体管形状
+      - PDK：模型、规则、层映射，以及标准单元、IO、存储编译器等
+      - 只约定包装彩盒
+      - 只约定 App 商店分成
+    answer: 1
+    explanation: 设计必须在 PDK 上施工；Foundry 按这套规则制造。
+    difficulty: easy
+
+  - id: q-foundry-pdk-2
+    chapter: foundry-pdk
+    type: judge
+    question: 标准单元库和 SRAM 编译器通常来自 Foundry 或紧密合作的库厂商，设计侧很少从零画每一个触发器。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 数字实现建立在库上；换厂换库几乎等于重做后端。
+    difficulty: easy
+
+  - id: q-foundry-pdk-3
+    chapter: foundry-pdk
+    type: single
+    question: MPW（多项目晶圆）对初创/高校的意义是？
+    options:
+      - 把多个设计拼到同一套光罩/晶圆，摊薄 NRE，适合验证
+      - 保证立刻百万级量产良率
+      - 不需要 PDK
+      - 只能做封装不能做硅
+    answer: 0
+    explanation: MPW 是代工生态里的低成本验证入口，不是量产合同的替代。
+    difficulty: easy
+
+  - id: q-foundry-pdk-4
+    chapter: foundry-pdk
+    type: scenario
+    question: 后端按 A 厂 PDK 签核完成后，采购改口要去 B 厂。最小代价的正确态度是？
+    options:
+      - 改个 foundry 名字即可 tapeout
+      - 视为新实现：库、规则、IP 和签核都要重来，评估周期与风险
+      - B 厂会读取 A 厂 GDS 并自动合法化
+      - 只改封装丝印上的厂名
+    answer: 1
+    explanation: PDK 不可平移；换厂是项目级变更。
+    difficulty: medium
+
+  - id: q-yield-cost-1
+    chapter: yield-cost
+    type: single
+    question: 芯片成本直觉里，NRE 与单颗变动成本大致分别指？
+    options:
+      - NRE 是每颗封装费，变动成本是一次性光罩
+      - NRE 含光罩、设计与工具等一次性投入，变动成本含晶圆、封装、测试等按颗发生
+      - 两者都与产量无关
+      - 良率不影响任何成本
+    answer: 1
+    explanation: 产量低时 NRE 摊销决定成败；产量高时面积、良率、封测更敏感。
+    difficulty: easy
+
+  - id: q-yield-cost-2
+    chapter: yield-cost
+    type: judge
+    question: 同样缺陷密度下，芯片面积越大，随机缺陷打中的概率通常越高，良率压力越大。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 这是良率第一直觉：面积是良率的敌人之一，也是成本的敌人。
+    difficulty: easy
+
+  - id: q-yield-cost-3
+    chapter: yield-cost
+    type: single
+    question: 为什么测试时间也是成本？
+    options:
+      - 测试不占用任何设备
+      - 每颗在测试机上的秒数乘以产量就是真金白银，DFT 差会让测试成本爆
+      - 测试时间只影响广告文案
+      - 良率与测试无关
+    answer: 1
+    explanation: 成本模型要看见封测：DFT 不是「后端小事」，它直接进 BOM。
+    difficulty: easy
+
+  - id: q-yield-cost-4
+    chapter: yield-cost
+    type: scenario
+    question: 产品年产 2 万颗，却选需要极贵光罩的先进节点，面积还很大。成本上最可能发生什么？
+    options:
+      - 单颗会极便宜，因为先进
+      - NRE 摊不到量上，单颗研发+光罩成本失控，成熟节点可能更划算
+      - 良率一定 100%
+      - 封装会免费
+    answer: 1
+    explanation: 成本综合题：小批量怕 NRE，大批量怕面积与良率；节点要按产量选。
+    difficulty: medium
+
+  - id: q-eda-cost-exam-1
+    chapter: eda-cost-exam
+    type: scenario
+    question: 把工具、节点、Foundry、成本串成决策，哪句最完整？
+    options:
+      - 先追最小纳米，工具可以没有，良率可以不管
+      - 先看应用与产量，再选节点与 Foundry/PDK，并确认 EDA+IP 视图能签核，最后用面积/良率/NRE 算账
+      - 先买最贵仿真器，节点随机
+      - 先流片再选 PDK
+    answer: 1
+    explanation: 本篇地图：需求 → 工艺契约 → 工具链 → 成本模型。
+    difficulty: medium
+
+  - id: q-eda-cost-exam-2
+    chapter: eda-cost-exam
+    type: single
+    question: 读「某先进制程量产」新闻时，设计者还应追问什么才算看懂？
+    options:
+      - 只问纳米数字
+      - 对应 PDK/库是否开放、良率与容量、封装和实际产品类别是否匹配
+      - 只问股价
+      - 只问 Logo 颜色
+    answer: 1
+    explanation: 先进制程是产能与生态，不是单点数字。
+    difficulty: easy
+
+  - id: q-eda-cost-exam-3
+    chapter: eda-cost-exam
+    type: judge
+    question: 没有对应工艺库的「综合」，得到的网表不能当作可流片实现，即使逻辑门名称看起来很真。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 综合与后端必须吃目标库；通用教学网表不等于 Foundry 契约。
+    difficulty: easy
+
+  - id: q-eda-cost-exam-4
+    chapter: eda-cost-exam
+    type: single
+    question: 光罩费用主要计入哪一类，并在什么产量下最痛？
+    options:
+      - 变动成本，产量越大越痛
+      - NRE，小批量时摊到单颗最痛
+      - 与节点无关的零成本
+      - 只计入软件订阅
+    answer: 1
+    explanation: 先进节点光罩极贵，这是小芯片创业常踩的坑。
+    difficulty: easy
+
+  - id: q-eda-cost-exam-5
+    chapter: eda-cost-exam
+    type: scenario
+    question: 同一 RTL，A 方案 28nm 面积大但光罩便宜、B 方案先进节点面积小但 NRE 惊人。如何选？
+    options:
+      - 永远选 B，因为纳米小
+      - 用目标产量做摊销：量小偏 A，量极大且性能功耗吃紧再评估 B
+      - 永远选面积大的
+      - 两种都不用 PDK
+    answer: 1
+    explanation: 终考：成本是产量的函数，工艺是约束不是虚荣。
+    difficulty: medium

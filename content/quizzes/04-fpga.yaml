@@ -1,0 +1,302 @@
+part: fpga
+questions:
+  - id: q-fpga-vs-asic-1
+    chapter: fpga-vs-asic
+    type: single
+    question: FPGA 相对 ASIC 最核心的产品属性是？
+    options:
+      - 出厂功能锁死，改功能必须重开光罩
+      - 用可编程逻辑反复配置，交付比特流，通常不必为每次功能改动定制光罩
+      - 完全没有时序问题
+      - 不能实现任何数字接口
+    answer: 1
+    explanation: 可重配与比特流交付是 FPGA 的身份；ASIC 用固定电路换效率，改功能代价是新一轮流片。
+    difficulty: easy
+
+  - id: q-fpga-vs-asic-2
+    chapter: fpga-vs-asic
+    type: judge
+    question: 同一功能在 FPGA 上跑通，就可以认为面积、功耗和时序余量已经等同于未来那颗 ASIC。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: FPGA 用 LUT 和可编程互连「搭」逻辑，代价是面积、功耗和可预测性；原型成功不等于 ASIC 收敛。
+    difficulty: easy
+
+  - id: q-fpga-vs-asic-3
+    chapter: fpga-vs-asic
+    type: single
+    question: 什么时候更应该坚持 FPGA 量产，而不是急着转 ASIC？
+    options:
+      - 规格每周都在变、批量不大、需要现场升级
+      - 已经千万级出货且功能十年冻结
+      - 必须做到同类 ASIC 的最低功耗
+      - 客户要求不能有任何可编程性
+    answer: 0
+    explanation: FPGA 吃的是灵活与上市时间；稳定超大批量且功耗面积极敏感时才更值得付 ASIC 的 NRE。
+    difficulty: easy
+
+  - id: q-fpga-vs-asic-4
+    chapter: fpga-vs-asic
+    type: scenario
+    question: 团队用 FPGA 验证了算法，老板要求「下周按同样网表流片 ASIC」。你该指出的最大风险是？
+    options:
+      - 没有风险，FPGA 网表可直接当 GDS
+      - 库、时序模型、时钟树、DFT、IO 与工艺规则都不同，必须按 ASIC 流程重做实现与签核
+      - 只需把比特流改名为 GDS
+      - FPGA 的 LUT 就是 Foundry 标准单元
+    answer: 1
+    explanation: 器件模型与签核清单不可平移；FPGA 是降风险手段，不是 ASIC 后端的替代品。
+    difficulty: medium
+
+  - id: q-fpga-fabric-1
+    chapter: fpga-fabric
+    type: single
+    question: FPGA 里实现组合逻辑的基本积木通常是？
+    options:
+      - 晶圆厂现场掺杂的定制运放
+      - 查找表 LUT，用存储器内容描述真值表
+      - 只能用片外 74 系列芯片
+      - 光刻胶
+    answer: 1
+    explanation: LUT + 触发器构成可配置逻辑块；互连网络把它们连成用户电路。
+    difficulty: easy
+
+  - id: q-fpga-fabric-2
+    chapter: fpga-fabric
+    type: judge
+    question: BRAM 和 DSP 硬核存在的意义之一，是避免用海量 LUT 去搭存储器和乘法器。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 硬核提供密度和速度；选型时要按资源表估 BRAM/DSP，而不是只看逻辑单元广告数。
+    difficulty: easy
+
+  - id: q-fpga-fabric-3
+    chapter: fpga-fabric
+    type: single
+    question: IO Bank 对板级设计最直接的约束是？
+    options:
+      - 任意管脚都支持任意电压标准且无时钟限制
+      - 电压标准、时钟输入位置和高速管脚必须按 Bank 规则分配
+      - IO 只影响丝印
+      - Bank 只用于模拟匹配
+    answer: 1
+    explanation: 管脚规划是 FPGA 项目前期工作；分错 Bank 会导致无法实现或信号完整性失败。
+    difficulty: easy
+
+  - id: q-fpga-fabric-4
+    chapter: fpga-fabric
+    type: scenario
+    question: 设计需要大量 18x18 乘法且片上缓存很大，却选了 LUT 很多、DSP/BRAM 很少的器件。后果更可能是？
+    options:
+      - 一定能自动用 LUT 做出同样时序的硬核性能
+      - 乘法与存储被拆进 LUT，拥塞和时序变差，甚至放不下
+      - 器件会在综合时长出 DSP
+      - 封装会自动换成更大
+    answer: 1
+    explanation: fabric 意识：资源类型比「逻辑门等效数」更决定能否放下。
+    difficulty: medium
+
+  - id: q-fpga-flow-1
+    chapter: fpga-flow
+    type: single
+    question: FPGA 设计流程相对 ASIC，通常少了哪一步、多了哪一步？
+    options:
+      - 少了综合，多了光罩
+      - 少了定制光罩流片，多了生成并下载比特流
+      - 少了布局布线，多了 FinFET 掺杂
+      - 少了约束，多了 DFT 扫描签核全集
+    answer: 1
+    explanation: 综合→实现（映射/布局/布线）→比特流→上板；没有 Foundry tapeout 这条链。
+    difficulty: easy
+
+  - id: q-fpga-flow-2
+    chapter: fpga-flow
+    type: judge
+    question: FPGA 实现阶段的映射、布局、布线可以完全不看时序约束，工具会自动猜到板级时钟。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 没有时钟/IO 约束，实现优化没有目标，上板「能跑」往往只是碰巧。
+    difficulty: easy
+
+  - id: q-fpga-flow-3
+    chapter: fpga-flow
+    type: single
+    question: 比特流（bitstream）是什么？
+    options:
+      - 给晶圆厂的 GDS 别名
+      - 配置 LUT、互连、BRAM 等内容的配置数据，下载后器件才变成你的电路
+      - 功能验证的覆盖率数据库
+      - 操作系统内核镜像的必经格式
+    answer: 1
+    explanation: FPGA 的「制造」发生在配置时刻；比特流丢失或损坏，硅上就不是那份设计。
+    difficulty: easy
+
+  - id: q-fpga-flow-4
+    chapter: fpga-flow
+    type: scenario
+    question: 仿真通过，实现也完成，但下载后行为不对。按流程应优先区分哪些原因？
+    options:
+      - 只可能是晶圆缺陷
+      - 板级时钟/复位、管脚约束、未约束跨域，或仿真与可综合代码不一致
+      - 一定是 LUT 硬件坏了，必须换 ASIC
+      - 比特流与设计无关
+    answer: 1
+    explanation: FPGA 调试要把「工具流问题」和「板级问题」分开，而不是立刻否定器件架构。
+    difficulty: medium
+
+  - id: q-timing-and-debug-1
+    chapter: timing-and-debug
+    type: single
+    question: FPGA 时序约束里，最基本、必须先写对的通常是？
+    options:
+      - 封装颜色
+      - 主时钟周期/频率，以及关键 IO 延迟
+      - 光罩层号
+      - 销售折扣
+    answer: 1
+    explanation: 时钟是实现与静态时序的基准；IO 约束把板级延迟纳入分析，否则片内「满足」片外仍失败。
+    difficulty: easy
+
+  - id: q-timing-and-debug-2
+    chapter: timing-and-debug
+    type: judge
+    question: ILA（或同类片内逻辑分析）可以在运行时抓内部信号，是板级调试相对「只看管脚」的优势。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 可重配让你把探针编进电路；但 ILA 本身占资源、可能改时序，要用得克制。
+    difficulty: easy
+
+  - id: q-timing-and-debug-3
+    chapter: timing-and-debug
+    type: single
+    question: 实现报告有时序违例仍强行下载，最可能的现象是？
+    options:
+      - 功能在所有温度电压下都更稳定
+      - 满频偶发错误，降频或降温有时会好转
+      - 比特流无法生成
+      - 器件变成模拟芯片
+    answer: 1
+    explanation: 与 ASIC 建立违例同构：周期不够则偶发；板级还会叠加电源噪声和时钟质量。
+    difficulty: easy
+
+  - id: q-timing-and-debug-4
+    chapter: timing-and-debug
+    type: scenario
+    question: 点灯成功后接 SPI 外设，逻辑分析仪看到时钟毛刺、采样错位。更合理的第一步不是改算法，而是？
+    options:
+      - 立刻流片 ASIC
+      - 检查时钟约束、IO 标准、板级走线与同步复位，并用 ILA 对比片内与管脚
+      - 删除所有触发器
+      - 把 SPI 改成无线协议就能消除毛刺
+    answer: 1
+    explanation: FPGA 从点灯到外设，失败点常在约束与板级，而不是又写一套组合逻辑。
+    difficulty: medium
+
+  - id: q-fpga-applications-1
+    chapter: fpga-applications
+    type: single
+    question: FPGA 在通信与图像系统里常见的角色是？
+    options:
+      - 只能点 LED，不能碰接口
+      - 做协议桥接、实时预处理或加速，常与 CPU/ASIC 分工
+      - 替代所有模拟前端而不需要 PHY
+      - 专门取代晶圆厂
+    answer: 1
+    explanation: 应用篇强调「合适的灵活度」：接口多变、算法未冻、需要并行时 FPGA 很合适。
+    difficulty: easy
+
+  - id: q-fpga-applications-2
+    chapter: fpga-applications
+    type: judge
+    question: ASIC 原型验证是 FPGA 的重要应用：用可重配平台提前跑软件和系统场景，降低一次流片风险。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 这是 FPGA 与数字流程的接口：原型不是最终硅，但能暴露规格和集成错误。
+    difficulty: easy
+
+  - id: q-fpga-applications-3
+    chapter: fpga-applications
+    type: single
+    question: 选择 FPGA 做边缘加速，相对「只上通用 CPU」的典型理由是？
+    options:
+      - FPGA 一定更省开发时间
+      - 确定性并行与可定制流水线，能在固定延迟下吞吐特定计算
+      - FPGA 不需要任何约束
+      - CPU 不能跑软件
+    answer: 1
+    explanation: 加速场景看的是并行与延迟确定性；若算法极不固定或团队无硬件能力，CPU/GPU 可能更合适。
+    difficulty: easy
+
+  - id: q-fpga-applications-4
+    chapter: fpga-applications
+    type: scenario
+    question: 产品要现场升级协议栈，批量每年几千套，功耗预算中等。更合理的路线是？
+    options:
+      - 每年流片一版 ASIC 追协议
+      - 用 FPGA（或含可编程逻辑的 SoC）交付，把升级做成比特流/固件
+      - 用纯模拟分立器件实现协议栈
+      - 不做接口，让用户口算
+    answer: 1
+    explanation: 应用选型：中小批量 + 现场升级是 FPGA 的主场；ASIC 适合冻结后的规模复制。
+    difficulty: medium
+
+  - id: q-fpga-exam-1
+    chapter: fpga-exam
+    type: scenario
+    question: 把 FPGA 篇收成一条决策链：先问什么，再问什么？
+    options:
+      - 先问纳米节点，再问 LUT 颜色
+      - 先问是否必须可重配/快速迭代，再问 fabric 资源与约束能否在板上收时序
+      - 先问光罩价格，再问能否点灯
+      - 先问运放匹配，再问扫描链
+    answer: 1
+    explanation: 综合对比、结构、流程与应用：器件选择由灵活度启动，由资源与时序收口。
+    difficulty: medium
+
+  - id: q-fpga-exam-2
+    chapter: fpga-exam
+    type: single
+    question: FPGA 流程与 ASIC 流程都有「综合」，但后续分叉在哪？
+    options:
+      - FPGA 走向实现与比特流，ASIC 走向工艺库网表、物理设计与签核流片
+      - FPGA 必须 DFT 扫描签核全集才能下载
+      - ASIC 下载比特流，FPGA 出 GDS
+      - 两者后续完全相同
+    answer: 0
+    explanation: 同一份 RTL 思想，两条后端：可编程配置 vs 可制造几何。
+    difficulty: easy
+
+  - id: q-fpga-exam-3
+    chapter: fpga-exam
+    type: judge
+    question: 板级调试可以替代时序约束：只要 ILA 能抓到信号，实现违例就可以忽略。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: ILA 是观察手段，不是时序闭合；违例在边角条件下仍会咬人。
+    difficulty: easy
+
+  - id: q-fpga-exam-4
+    chapter: fpga-exam
+    type: single
+    question: 下列哪项是 FPGA fabric 资源，而不是 ASIC 后端专有步骤？
+    options:
+      - 光罩 OPC
+      - LUT、BRAM、DSP、IO Bank
+      - 多项目晶圆 MPW 拼版
+      - 晶圆探针卡设计
+    answer: 1
+    explanation: 考结构词汇是否记在正确器件上。
+    difficulty: easy
+
+  - id: q-fpga-exam-5
+    chapter: fpga-exam
+    type: scenario
+    question: 用 FPGA 做 ASIC 原型时，仍把高速接口换成低速 GPIO「先跑通软件」。这样做的收益和陷阱？
+    options:
+      - 只有收益没有陷阱
+      - 能提前验证寄存器与驱动，但带宽/CDC/PHY 相关缺陷会被掩盖，不能宣称接口已签核
+      - 只有陷阱，原型必须比特级等价
+      - GPIO 会自动变成 PCIe PHY
+    answer: 1
+    explanation: 原型策略题：降保真换进度是合理的，但必须诚实记录「哪些规格还没在真实协议上练到」。
+    difficulty: medium

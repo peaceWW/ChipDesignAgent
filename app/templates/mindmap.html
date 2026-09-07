@@ -1,0 +1,19 @@
+{% extends "base.html" %}
+{% block title %}{{ current.title }} · 思维导图{% endblock %}
+{% block content %}
+<div class="reader">
+  <aside class="toc">
+    <p class="toc-kicker">思维导图</p>
+    <ol>
+      {% for mid, item in mindmaps.items() %}
+      <li class="{% if item.id == current.id %}on{% endif %}">
+        <a href="/mindmap/{{ item.id }}">{{ item.title }}</a>
+      </li>
+      {% endfor %}
+    </ol>
+  </aside>
+  <article class="prose">
+    {{ current.html | safe }}
+  </article>
+</div>
+{% endblock %}

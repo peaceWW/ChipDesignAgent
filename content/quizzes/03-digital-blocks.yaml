@@ -1,0 +1,350 @@
+part: digital-blocks
+questions:
+  - id: q-combo-seq-logic-1
+    chapter: combo-seq-logic
+    type: single
+    question: 组合逻辑与时序逻辑最本质的差别是？
+    options:
+      - 组合有记忆，时序没有记忆
+      - 组合输出只由当前输入（经延迟后）决定，时序输出还取决于被保存的状态
+      - 组合必须用时钟，时序禁止用时钟
+      - 两者都不能用门电路实现
+    answer: 1
+    explanation: 组合无记忆，时序靠触发器等在时钟沿保存数据；数字芯片骨架是「组合计算 + 沿触发寄存」。
+    difficulty: easy
+
+  - id: q-combo-seq-logic-2
+    chapter: combo-seq-logic
+    type: judge
+    question: 锁存器对时钟电平敏感，入门同步设计应优先使用边沿触发器，而不是主动堆锁存器。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 锁存器时序分析更棘手，容易在综合推断中意外出现；同步设计默认用 flip-flop。
+    difficulty: easy
+
+  - id: q-combo-seq-logic-3
+    chapter: combo-seq-logic
+    type: single
+    question: 静态时序分析为什么把触发器当作路径锚点？
+    options:
+      - 因为触发器不参与任何时序
+      - 组合路径的起点和终点通常是寄存沿，分析的是「一拍内能否走完」
+      - 因为组合逻辑没有延迟
+      - 因为 STA 只分析软件循环
+    answer: 1
+    explanation: 芯片按拍前进，STA 检查的就是拍与拍之间的组合云是否在建立/保持窗口内。
+    difficulty: easy
+
+  - id: q-combo-seq-logic-4
+    chapter: combo-seq-logic
+    type: scenario
+    question: 交通灯控制器里，下一状态由组合算出，但灯色输出直接从组合拿到路口，中间不寄存。最可能的现场问题是？
+    options:
+      - 没有任何问题，组合输出一定无毛刺
+      - 组合译码过程中的竞争会造成灯色毛刺闪烁
+      - 触发器会自动插入到所有输出
+      - 时钟会消失
+    answer: 1
+    explanation: 对外可见的控制量应在拍沿更新；纯组合输出容易把内部竞争送到管脚。
+    difficulty: medium
+
+  - id: q-clock-reset-cdc-1
+    chapter: clock-reset-cdc
+    type: single
+    question: 跨时钟域（CDC）时，单比特控制信号最常用的入门级手段是？
+    options:
+      - 再加一级很长的组合逻辑
+      - 两级同步器在目标时钟域重新采样
+      - 把两个时钟短接成同一个
+      - 只用保持时间违例来传递数据
+    answer: 1
+    explanation: 第一级可能亚稳，第二级给它一拍稳定；加组合不能解决采样窗口问题。
+    difficulty: easy
+
+  - id: q-clock-reset-cdc-2
+    chapter: clock-reset-cdc
+    type: judge
+    question: 多比特总线只要对每一位各加两级同步器，就一定能保证整组数据在接收域被看成同一拍有效值。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 各位可能不同拍稳定，会拼出从未发送过的中间值；多比特要握手、格雷码或异步 FIFO。
+    difficulty: easy
+
+  - id: q-clock-reset-cdc-3
+    chapter: clock-reset-cdc
+    type: single
+    question: 异步复位「释放」为什么还要再同步到本地时钟？
+    options:
+      - 释放沿不对齐时，不同触发器可能有的退出复位、有的仍亚稳，造成起始状态撕裂
+      - 异步复位禁止用于任何芯片
+      - 同步释放是为了提高主频广告数字
+      - 复位释放与亚稳态无关
+    answer: 0
+    explanation: 异步复位可以立刻生效，但释放必须当作 CDC 问题处理，否则系统从垃圾/不一致状态起步。
+    difficulty: easy
+
+  - id: q-clock-reset-cdc-4
+    chapter: clock-reset-cdc
+    type: scenario
+    question: 慢钟域拉出一个很窄的「数据就绪」脉冲给快钟 CPU。直接相连最危险的是什么？如何改？
+    options:
+      - 没有危险；应再把脉冲改得更窄
+      - 脉冲可能被漏采样或亚稳；应改成电平加两级同步，或用异步 FIFO 握手
+      - 应删除 CPU 时钟
+      - 应只在模拟仿真里看直流工作点
+    answer: 1
+    explanation: 窄脉冲跨域会丢失；可靠做法是电平+应答或 FIFO，而不是「再快一点采样」。
+    difficulty: medium
+
+  - id: q-fsm-pipeline-1
+    chapter: fsm-pipeline
+    type: single
+    question: 状态机在数字模块里的主要职责是？
+    options:
+      - 替代所有存储器
+      - 用显式状态表达控制意图：何时发请求、等待、重试或完成
+      - 专门做模拟滤波
+      - 自动生成光罩
+    answer: 1
+    explanation: FSM 把协议和控制流程变成可验证的状态与转移，数据通路则负责算和搬。
+    difficulty: easy
+
+  - id: q-fsm-pipeline-2
+    chapter: fsm-pipeline
+    type: judge
+    question: 流水线用寄存器把长组合路径切开，用延迟（拍数）换更短的周期，从而冲击更高时钟频率。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 这是流水线的入门直觉：切拍换频率，但会引入冒险、转发和填充气泡等成本。
+    difficulty: easy
+
+  - id: q-fsm-pipeline-3
+    chapter: fsm-pipeline
+    type: single
+    question: 流水线数据冒险（后指令需要前指令尚未写回的结果）常用的硬件直觉是？
+    options:
+      - 忽略冒险，让错误结果当作特性
+      - 转发/旁路或插入停顿，保证读到正确数据
+      - 拆除所有寄存器
+      - 改用异步复位代替流水线
+    answer: 1
+    explanation: 切拍之后必须处理数据相关；转发减少气泡，停顿是更保守的正确性手段。
+    difficulty: easy
+
+  - id: q-fsm-pipeline-4
+    chapter: fsm-pipeline
+    type: scenario
+    question: 协议控制器把「发送、等 ACK、超时重传」全写成几十级深度流水且无状态名。评审最该担心什么？
+    options:
+      - 频率一定会更高，所以更好
+      - 控制意图被淹没，验证难以覆盖超时/重试，也不易证明不会卡死
+      - 状态名是语法糖，对验证没有影响
+      - 流水越深，CDC 会自动消失
+    answer: 1
+    explanation: 控制适合 FSM 显式化；盲目深流水不增加协议清晰度，还让覆盖率和死锁分析变难。
+    difficulty: medium
+
+  - id: q-memory-fifo-1
+    chapter: memory-fifo
+    type: single
+    question: SRAM、ROM、FIFO 在数字芯片里各自最典型的角色是？
+    options:
+      - SRAM 只读固件，ROM 可随意写，FIFO 是运算器
+      - SRAM 可读写工作存储，ROM 存固定内容，FIFO 做弹性缓冲与速率匹配
+      - 三者都是模拟运放
+      - FIFO 只能用在模拟版图
+    answer: 1
+    explanation: 存储词汇要分清：工作数据、常量表/固件、以及生产者-消费者之间的队列。
+    difficulty: easy
+
+  - id: q-memory-fifo-2
+    chapter: memory-fifo
+    type: judge
+    question: 异步 FIFO 的本质是带跨时钟域指针同步的队列，常用来安全搬运多比特数据。
+    options: ["正确", "错误"]
+    answer: 0
+    explanation: 异步 FIFO 用格雷码指针 + 同步器传递满空，避免多比特总线直接同步。
+    difficulty: easy
+
+  - id: q-memory-fifo-3
+    chapter: memory-fifo
+    type: single
+    question: 同步 FIFO 的满/空标志若算错一位，最危险的功能后果是？
+    options:
+      - 只会让主频提高
+      - 写入已满队列或读出空队列，造成数据丢失或重复
+      - 自动变成 ROM
+      - 封装引脚会短路
+    answer: 1
+    explanation: FIFO 正确性首先是指针与满空；差一就会在系统里表现为偶发数据损坏。
+    difficulty: easy
+
+  - id: q-memory-fifo-4
+    chapter: memory-fifo
+    type: scenario
+    question: DMA 写出速度远快于外设消耗，却只用一拍寄存器衔接。更好的模块选择是？
+    options:
+      - 再加一级组合取反
+      - 用足够深度的 FIFO（必要时加反压）做速率匹配
+      - 删掉 DMA
+      - 把外设时钟接到随机源
+    answer: 1
+    explanation: 存储器章节的应用直觉：弹性缓冲是带宽不匹配时的标准积木，单拍寄存器不够吃突发。
+    difficulty: medium
+
+  - id: q-low-power-1
+    chapter: low-power
+    type: single
+    question: 时钟门控降低动态功耗的直觉是？
+    options:
+      - 让触发器在不需要更新时停止打拍，减少无用翻转
+      - 把电源电压无限升高
+      - 增加时钟树负载到最大
+      - 用更小的纳米节点口号代替设计
+    answer: 0
+    explanation: 动态功耗与翻转成正比；门控是最常见、相对局部的低功耗手段。
+    difficulty: easy
+
+  - id: q-low-power-2
+    chapter: low-power
+    type: judge
+    question: 电源关断（power gating）只关时钟、不关电源，因此泄漏功耗完全不变。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 时钟门控主要砍动态功耗；电源关断切断电压域，才能显著压泄漏，但需要隔离与恢复序列。
+    difficulty: easy
+
+  - id: q-low-power-3
+    chapter: low-power
+    type: single
+    question: 多电压域设计额外引入的关键问题是？
+    options:
+      - 不再需要任何电平转换
+      - 跨压域信号需要电平移位，并与电源顺序、隔离策略一起规划
+      - STA 可以忽略多电压
+      - 多电压会自动解决所有 CDC
+    answer: 1
+    explanation: 低功耗不是只插门控单元；电压域是架构级决策，影响物理、时序和验证。
+    difficulty: easy
+
+  - id: q-low-power-4
+    chapter: low-power
+    type: scenario
+    question: 为了省电把慢外设时钟完全关掉，却仍让 CPU 轮询其状态寄存器。最可能发生什么？
+    options:
+      - 外设会在无时钟下继续更新寄存器
+      - 读到冻结/无效状态，且开关时钟本身构成新的 CDC 与复位风险
+      - 功耗一定下降且功能不变
+      - DFT 扫描会代替外设应答
+    answer: 1
+    explanation: 低功耗与 CDC/复位强耦合：关钟前要握手、隔离，恢复后要重新同步，不能当透明无操作。
+    difficulty: medium
+
+  - id: q-ip-soc-integration-1
+    chapter: ip-soc-integration
+    type: single
+    question: SoC 集成阶段最核心的工作不是从门画 CPU，而是？
+    options:
+      - 把处理器、总线、存储控制器、外设 IP 按地址映射和时钟复位域拼成可启动系统
+      - 手写全部标准单元版图
+      - 取消所有验证
+      - 只画封装贴纸
+    answer: 0
+    explanation: 现代 SoC 是 IP 复用与集成验证：地址、中断、时钟、电源和启动路径比「再画一个加法器」更关键。
+    difficulty: easy
+
+  - id: q-ip-soc-integration-2
+    chapter: ip-soc-integration
+    type: judge
+    question: 买到 CPU IP 授权后，不需要再做集成验证，因为 IP 厂商已经替你验证过整颗芯片。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: IP 验证的是核本身；地址译码、桥、时钟复位、软件启动和系统场景仍要在 SoC 级证明。
+    difficulty: easy
+
+  - id: q-ip-soc-integration-3
+    chapter: ip-soc-integration
+    type: single
+    question: 地址映射（memory map）出错，典型症状是？
+    options:
+      - 软件访问外设落到错误从设备或空洞，系统表现为乱码、挂死或误配置
+      - 光罩层数自动增加
+      - 模拟噪声一定消失
+      - 封装热阻下降
+    answer: 0
+    explanation: 集成的「马路牌」是地址、中断号和启动向量；译码错误是最常见的系统级缺陷。
+    difficulty: easy
+
+  - id: q-ip-soc-integration-4
+    chapter: ip-soc-integration
+    type: scenario
+    question: 迷你 SoC 能取指，但写 UART 寄存器无波形。集成排查顺序哪项更合理？
+    options:
+      - 先怀疑光刻机，再怀疑运放匹配
+      - 查地址译码、时钟使能、复位释放和总线握手，再查 UART IP 配置
+      - 直接提高 CPU 主频
+      - 把 SRAM 换成 ROM 即可打印
+    answer: 1
+    explanation: 集成问题先沿「有没有选中、有没有钟、有没有出复位、握手有没有完成」走，而不是先跳到工艺。
+    difficulty: medium
+
+  - id: q-digital-blocks-exam-1
+    chapter: digital-blocks-exam
+    type: scenario
+    question: 用本篇积木描述「CPU 经总线写外设、外设慢、中间还跨钟」，最少需要哪些模块意识？
+    options:
+      - 只需组合逻辑，不需要时钟概念
+      - 时序寄存、总线/地址映射、异步 FIFO 或同步器、以及可能的时钟门控
+      - 只需运放
+      - 只需光罩
+    answer: 1
+    explanation: 综合题把组合时序、CDC、FIFO、低功耗和集成地图绑在一个场景里。
+    difficulty: medium
+
+  - id: q-digital-blocks-exam-2
+    chapter: digital-blocks-exam
+    type: single
+    question: 下列哪组对应关系是正确的？
+    options:
+      - 组合↔记忆，触发器↔无时钟，FIFO↔光刻
+      - 组合↔计算，触发器↔按拍记忆，CDC↔安全跨节奏，FSM↔控制意图
+      - SRAM↔只做时钟树，ROM↔动态功耗主因
+      - 电源关断↔只关扫描使能
+    answer: 1
+    explanation: 模块篇要能用一句话还原每块积木的职责，避免名词错位。
+    difficulty: easy
+
+  - id: q-digital-blocks-exam-3
+    chapter: digital-blocks-exam
+    type: judge
+    question: 静态时序分析默认覆盖所有跨时钟域路径，因此有 STA 报告就可以不做 CDC 审查。
+    options: ["正确", "错误"]
+    answer: 1
+    explanation: 模块篇与流程篇交汇点：STA 不管默认跨域，CDC 是独立纪律。
+    difficulty: easy
+
+  - id: q-digital-blocks-exam-4
+    chapter: digital-blocks-exam
+    type: single
+    question: 低功耗手段从「局部」到「架构级」由浅到深，较合理的顺序是？
+    options:
+      - 电源关断 → 先拆芯片 → 再做时钟门控
+      - 时钟门控 → 多电压/调频 → 电源关断与域隔离
+      - 只做电源关断，禁止门控
+      - 先关断再设计时钟树，无需恢复序列
+    answer: 1
+    explanation: 入门应理解代价递增：门控最常用，电压域和关断影响隔离、启动和物理实现。
+    difficulty: easy
+
+  - id: q-digital-blocks-exam-5
+    chapter: digital-blocks-exam
+    type: scenario
+    question: 要把外购以太网 MAC IP 集成进 SoC，除挂 AXI 外，还必须提前规划哪些「模块级」事项？
+    options:
+      - 只规划丝印
+      - 时钟复位域、DMA/FIFO 带宽、中断与地址、以及与 PHY 的接口时钟
+      - 只规划运放匹配
+      - 不需要软件驱动
+    answer: 1
+    explanation: IP 集成是模块知识的汇合：钟复位、存储弹性、地址中断，并预留协议篇的 Controller-PHY 边界。
+    difficulty: medium

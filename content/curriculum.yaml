@@ -1,0 +1,362 @@
+book:
+  id: chip-design-handbook
+  title: 芯片设计入门手册
+  subtitle: 给行业小白的流程、模块与协议全景
+  description: >
+    从规格到量产，把数字芯片、FPGA、模拟混合信号和协议体系串成一张地图。
+    每章只讲概念、作用、流程位置和应用场景，读完能开口讲清一颗芯片怎么做出来。
+  hours: 12
+  tags: [芯片设计, SoC, FPGA, 模拟, 协议, 入门]
+
+parts:
+  - id: landscape
+    number: 1
+    slug: 01-landscape
+    title: 行业全景
+    summary: 先分清芯片、ASIC、SoC、FPGA，再看产业链、分类、岗位和从规格到量产的大图。
+    minutes: 70
+    chapters:
+      - id: what-is-a-chip
+        file: 01-what-is-a-chip.md
+        title: 什么是芯片
+        minutes: 12
+        prereq: []
+        tags: [基础, IC, ASIC, SoC, FPGA]
+      - id: industry-chain
+        file: 02-industry-chain.md
+        title: 半导体产业链
+        minutes: 12
+        prereq: [what-is-a-chip]
+        tags: [产业链, 设计, 制造, 封测, EDA, IP]
+      - id: chip-taxonomy
+        file: 03-chip-taxonomy.md
+        title: 芯片怎么分类
+        minutes: 12
+        prereq: [what-is-a-chip]
+        tags: [分类, 数字, 模拟, 存储, 功率]
+      - id: roles-and-collaboration
+        file: 04-roles-and-collaboration.md
+        title: 岗位与协作
+        minutes: 12
+        prereq: [industry-chain]
+        tags: [岗位, 前端, 验证, 后端, DFT]
+      - id: spec-to-production
+        file: 05-spec-to-production.md
+        title: 从规格到量产
+        minutes: 12
+        prereq: [industry-chain, chip-taxonomy]
+        tags: [流程, 流片, 量产]
+      - id: common-myths
+        file: 06-common-myths.md
+        title: 入门常见误区
+        minutes: 10
+        prereq: [spec-to-production]
+        tags: [误区, 学习路径]
+
+  - id: digital-flow
+    number: 2
+    slug: 02-digital-flow
+    title: 数字芯片设计流程
+    summary: 全书主时间轴：规格架构、RTL、验证、综合、STA、DFT、物理设计，直到签核流片。
+    minutes: 110
+    chapters:
+      - id: spec-and-architecture
+        file: 01-spec-and-architecture.md
+        title: 规格与架构设计
+        minutes: 14
+        prereq: [spec-to-production]
+        tags: [规格, 架构, 微架构]
+      - id: rtl-coding
+        file: 02-rtl-coding.md
+        title: RTL 编码
+        minutes: 14
+        prereq: [spec-and-architecture]
+        tags: [RTL, Verilog, SystemVerilog]
+      - id: functional-verification
+        file: 03-functional-verification.md
+        title: 功能验证
+        minutes: 14
+        prereq: [rtl-coding]
+        tags: [验证, 仿真, UVM, 覆盖率]
+      - id: synthesis
+        file: 04-synthesis.md
+        title: 逻辑综合
+        minutes: 14
+        prereq: [rtl-coding]
+        tags: [综合, 网表, 约束]
+      - id: sta
+        file: 05-sta.md
+        title: 静态时序分析
+        minutes: 14
+        prereq: [synthesis]
+        tags: [STA, 时序, 建立保持]
+      - id: dft
+        file: 06-dft.md
+        title: 可测试性设计 DFT
+        minutes: 12
+        prereq: [synthesis]
+        tags: [DFT, 扫描, BIST]
+      - id: physical-design
+        file: 07-physical-design.md
+        title: 物理设计
+        minutes: 14
+        prereq: [synthesis, sta]
+        tags: [后端, 布局, 布线, CTS]
+      - id: signoff-tapeout
+        file: 08-signoff-tapeout.md
+        title: 签核、流片与封测
+        minutes: 14
+        prereq: [physical-design, dft]
+        tags: [签核, 流片, 封装, 测试]
+
+  - id: digital-blocks
+    number: 3
+    slug: 03-digital-blocks
+    title: 数字设计核心模块
+    summary: 读懂数字芯片内部的积木：逻辑、时钟、状态机、存储、功耗和 IP 集成。
+    minutes: 80
+    chapters:
+      - id: combo-seq-logic
+        file: 01-combo-seq-logic.md
+        title: 组合逻辑与时序逻辑
+        minutes: 13
+        prereq: [rtl-coding]
+        tags: [组合, 时序, 触发器]
+      - id: clock-reset-cdc
+        file: 02-clock-reset-cdc.md
+        title: 时钟、复位与跨时钟域
+        minutes: 14
+        prereq: [combo-seq-logic]
+        tags: [时钟, 复位, CDC]
+      - id: fsm-pipeline
+        file: 03-fsm-pipeline.md
+        title: 状态机与流水线
+        minutes: 13
+        prereq: [combo-seq-logic]
+        tags: [FSM, 流水线]
+      - id: memory-fifo
+        file: 04-memory-fifo.md
+        title: 存储器与 FIFO
+        minutes: 13
+        prereq: [combo-seq-logic]
+        tags: [SRAM, FIFO, ROM]
+      - id: low-power
+        file: 05-low-power.md
+        title: 低功耗概念
+        minutes: 13
+        prereq: [clock-reset-cdc]
+        tags: [功耗, 时钟门控, 多电压]
+      - id: ip-soc-integration
+        file: 06-ip-soc-integration.md
+        title: IP 复用与 SoC 集成
+        minutes: 14
+        prereq: [memory-fifo, spec-and-architecture]
+        tags: [IP, SoC, 集成]
+
+  - id: fpga
+    number: 4
+    slug: 04-fpga
+    title: FPGA 入门
+    summary: 用可重复烧写的芯片理解数字设计：结构、流程、约束、调试和应用。
+    minutes: 65
+    chapters:
+      - id: fpga-vs-asic
+        file: 01-fpga-vs-asic.md
+        title: FPGA 与 ASIC 的差别
+        minutes: 12
+        prereq: [what-is-a-chip]
+        tags: [FPGA, ASIC, 对比]
+      - id: fpga-fabric
+        file: 02-fpga-fabric.md
+        title: FPGA 内部结构
+        minutes: 14
+        prereq: [fpga-vs-asic]
+        tags: [LUT, BRAM, DSP, IO]
+      - id: fpga-flow
+        file: 03-fpga-flow.md
+        title: FPGA 设计流程
+        minutes: 13
+        prereq: [fpga-fabric, rtl-coding]
+        tags: [综合, 实现, 比特流]
+      - id: timing-and-debug
+        file: 04-timing-and-debug.md
+        title: 时序约束与板级调试
+        minutes: 13
+        prereq: [fpga-flow]
+        tags: [约束, ILA, 调试]
+      - id: fpga-applications
+        file: 05-fpga-applications.md
+        title: FPGA 应用场景
+        minutes: 13
+        prereq: [fpga-flow]
+        tags: [原型, 通信, 加速]
+
+  - id: analog
+    number: 5
+    slug: 05-analog
+    title: 模拟与数模混合
+    summary: 换一套思维方式看连续信号：模块、仿真、版图、工艺与 PDK。
+    minutes: 65
+    chapters:
+      - id: analog-vs-digital
+        file: 01-analog-vs-digital.md
+        title: 模拟与数字的思维差异
+        minutes: 12
+        prereq: [chip-taxonomy]
+        tags: [模拟, 数字, 思维]
+      - id: analog-blocks
+        file: 02-analog-blocks.md
+        title: 常用模拟模块
+        minutes: 14
+        prereq: [analog-vs-digital]
+        tags: [运放, ADC, DAC, LDO, PLL]
+      - id: simulation-types
+        file: 03-simulation-types.md
+        title: 模拟仿真类型
+        minutes: 13
+        prereq: [analog-blocks]
+        tags: [DC, AC, Transient, Noise]
+      - id: layout-matching
+        file: 04-layout-matching.md
+        title: 版图与匹配
+        minutes: 13
+        prereq: [analog-blocks]
+        tags: [版图, 匹配, 寄生]
+      - id: pdk-process
+        file: 05-pdk-process.md
+        title: PDK 与工艺常识
+        minutes: 13
+        prereq: [layout-matching]
+        tags: [PDK, 工艺, 器件]
+
+  - id: protocols
+    number: 6
+    slug: 06-protocols
+    title: 完整协议体系
+    summary: 不堆名词，按「芯片里协议如何落地」讲清片上、存储、高速、板级与选型。
+    minutes: 140
+    chapters:
+      - id: protocol-layers
+        file: 01-protocol-layers.md
+        title: 协议如何在芯片里落地
+        minutes: 14
+        prereq: [ip-soc-integration]
+        tags: [协议, PHY, Controller, 分层]
+      - id: onchip-bus
+        file: 02-onchip-bus.md
+        title: 片上互连 AXI AHB APB
+        minutes: 14
+        prereq: [protocol-layers]
+        tags: [AXI, AHB, APB, AMBA]
+      - id: coherency-noc
+        file: 03-coherency-noc.md
+        title: 一致性总线与片上网络
+        minutes: 14
+        prereq: [onchip-bus]
+        tags: [ACE, CHI, NoC]
+      - id: memory-interfaces
+        file: 04-memory-interfaces.md
+        title: 存储接口
+        minutes: 14
+        prereq: [protocol-layers, memory-fifo]
+        tags: [DDR, LPDDR, HBM, Flash]
+      - id: highspeed-io
+        file: 05-highspeed-io.md
+        title: 高速互连 PCIe USB Ethernet
+        minutes: 14
+        prereq: [protocol-layers]
+        tags: [PCIe, USB, Ethernet]
+      - id: multimedia-io
+        file: 06-multimedia-io.md
+        title: 多媒体接口
+        minutes: 13
+        prereq: [protocol-layers]
+        tags: [MIPI, HDMI, DisplayPort]
+      - id: board-lowspeed
+        file: 07-board-lowspeed.md
+        title: 板级低速接口
+        minutes: 14
+        prereq: [protocol-layers]
+        tags: [I2C, SPI, UART, I2S, CAN, GPIO]
+      - id: debug-jtag
+        file: 08-debug-jtag.md
+        title: 调试与测试接口
+        minutes: 13
+        prereq: [dft]
+        tags: [JTAG, SWD, 调试]
+      - id: wireless-in-soc
+        file: 09-wireless-in-soc.md
+        title: 无线如何进入 SoC
+        minutes: 13
+        prereq: [highspeed-io]
+        tags: [Wi-Fi, 蓝牙, 蜂窝]
+      - id: protocol-selection
+        file: 10-protocol-selection.md
+        title: 协议选型地图
+        minutes: 17
+        prereq: [onchip-bus, memory-interfaces, highspeed-io, board-lowspeed]
+        tags: [选型, 带宽, 功耗]
+
+  - id: eda-cost
+    number: 7
+    slug: 07-eda-cost
+    title: EDA、工艺与成本
+    summary: 看懂工具链、工艺节点、Foundry/PDK，以及良率和成本的直觉。
+    minutes: 50
+    chapters:
+      - id: eda-toolchain
+        file: 01-eda-toolchain.md
+        title: EDA 工具链角色
+        minutes: 13
+        prereq: [physical-design]
+        tags: [EDA, Synopsys, Cadence, Siemens]
+      - id: process-nodes
+        file: 02-process-nodes.md
+        title: 工艺节点是什么意思
+        minutes: 12
+        prereq: [pdk-process]
+        tags: [工艺节点, nm, FinFET]
+      - id: foundry-pdk
+        file: 03-foundry-pdk.md
+        title: Foundry 与 PDK
+        minutes: 13
+        prereq: [process-nodes]
+        tags: [Foundry, PDK, 代工]
+      - id: yield-cost
+        file: 04-yield-cost.md
+        title: 良率与成本直觉
+        minutes: 12
+        prereq: [foundry-pdk, signoff-tapeout]
+        tags: [良率, 成本, 光罩]
+
+  - id: cases
+    number: 8
+    slug: 08-cases
+    title: 走读案例与学习路径
+    summary: 用迷你 SoC、FPGA 外设和混合信号芯片把前面知识串起来，并给出自学路线。
+    minutes: 55
+    chapters:
+      - id: mini-soc-walkthrough
+        file: 01-mini-soc-walkthrough.md
+        title: 迷你 SoC 走读
+        minutes: 15
+        prereq: [ip-soc-integration, onchip-bus]
+        tags: [SoC, 案例, CPU]
+      - id: fpga-blink-to-peripheral
+        file: 02-fpga-blink-to-peripheral.md
+        title: FPGA 从点灯到外设
+        minutes: 13
+        prereq: [fpga-flow, board-lowspeed]
+        tags: [FPGA, 案例]
+      - id: mixed-signal-teardown
+        file: 03-mixed-signal-teardown.md
+        title: 数模混合芯片拆解
+        minutes: 14
+        prereq: [analog-blocks, protocol-layers]
+        tags: [混合信号, 案例]
+      - id: learning-path
+        file: 04-learning-path.md
+        title: 自学路线与资源
+        minutes: 13
+        prereq: [common-myths]
+        tags: [学习路径, 资源]

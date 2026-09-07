@@ -1,0 +1,43 @@
+{% extends "base.html" %}
+{% block title %}{{ book.title }}{% endblock %}
+{% block content %}
+<section class="hero">
+  <p class="eyebrow">Chip Design Handbook</p>
+  <h1>{{ book.title }}</h1>
+  <p class="lede">{{ book.subtitle }}</p>
+  <p class="desc">{{ book.description }}</p>
+  <div class="hero-meta">
+    <span>{{ parts | length }} 篇</span>
+    <span>{{ stats.total }} 章</span>
+    <span>约 {{ book.hours }} 小时</span>
+    <span>232 道自测</span>
+  </div>
+  <div class="progress-panel">
+    <div class="progress-copy">
+      <strong>学习进度 {{ stats.pct }}%</strong>
+      <span>已读 {{ stats.read }} / {{ stats.total }} 章 · 章测 {{ stats.quiz }} · 综合测验 {{ stats.exam_done }} / {{ stats.exam_total }}</span>
+    </div>
+    <div class="bar"><i style="width: {{ stats.pct }}%"></i></div>
+  </div>
+  <div class="hero-actions">
+    <a class="primary" href="/part/landscape">开始阅读</a>
+    <a class="ghost" href="/mindmap">看全书导图</a>
+  </div>
+</section>
+
+<section class="grid">
+  {% for part in parts %}
+  {% set ps = stats.parts[part.id] %}
+  <a class="card" href="/part/{{ part.id }}">
+    <div class="card-kicker">Part {{ part.no }} · {{ part.minutes }} 分钟</div>
+    <h2>{{ part.title }}</h2>
+    <p>{{ part.summary }}</p>
+    <div class="card-foot">
+      <span>{{ part.chapters | length }} 章</span>
+      <span>{{ ps.read }} 已读 · {{ ps.pct }}%</span>
+    </div>
+    <div class="bar slim"><i style="width: {{ ps.pct }}%"></i></div>
+  </a>
+  {% endfor %}
+</section>
+{% endblock %}
